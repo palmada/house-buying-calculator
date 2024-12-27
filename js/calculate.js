@@ -52,6 +52,8 @@ function calculate() {
     let simulations = [];
     let loss_to_rent = rent;
     let total_costs = []
+    let min_cost = Number.MAX_VALUE;
+    let min_cost_simulation;
 
     for (let month_index = 1; month_index <= months_until_retirement; month_index++) {
 
@@ -66,12 +68,21 @@ function calculate() {
         )
         simulations.push(simulation);
 
-        total_costs.push(simulation.total_interest_on_mortgage + loss_to_rent + tax_amount);
+        let total_cost = simulation.total_interest_on_mortgage + loss_to_rent + tax_amount;
+        total_costs.push(total_cost);
+        if (total_cost < min_cost) {
+            min_cost = total_cost;
+            min_cost_simulation = simulation;
+        }
 
         if (simulation.savings < house_price + tax_amount){
             loss_to_rent += rent;
         }
     }
+
+    document.getElementById('min_cost').innerHTML = min_cost.toFixed(2);
+    document.getElementById('min_cost_date').innerHTML = min_cost_simulation.date.toLocaleDateString("en-GB");
+    document.getElementById('min_cost_deposit').innerHTML = min_cost_simulation.deposit_percentage.toFixed(2);
 }
 
 /**

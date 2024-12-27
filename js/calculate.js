@@ -31,4 +31,21 @@ function calculate() {
     }
 
     document.getElementById('months_retirement').innerHTML = months_until_retirement.toString();
+
+    let house_price = parseFloat(document.getElementById("house_price").value);
+    let tax_selection = document.getElementById("taxes").selectedIndex;
+    let tax_amount;
+
+    switch (tax_selection) {
+        case 0:
+            tax_amount = taxes_spain(house_price);
+            break
+        default:
+            tax_amount = parseFloat(document.getElementById("custom_tax_amount").value);
+            if (tax_amount < 0 || isNaN(tax_amount) ) {
+                tax_amount = 0;
+            }
+    }
+
+    document.getElementById('tax_amount').innerHTML = tax_amount.toString();
 }

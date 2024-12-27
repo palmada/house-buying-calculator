@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 <script src="js/update_currency.js"></script>
 <script src="js/input_parameters.js"></script>
+<script src="js/taxes.js"></script>
 <script src="js/calculate.js"></script>
 
 <body>
@@ -48,11 +49,23 @@ If not, see <https://www.gnu.org/licenses/>.
         <br>
         <label for="retirement_age">Retirement age:</label>
         <input type="number" id="retirement_age" name="retirement_age" oninput="calculate()">
+        <br>
+        <label for="taxes">Country (determines taxes to pay):</label>
+        <select id="taxes" name="taxes" oninput="calculate()">
+            <option value="spain">Spain</option>
+            <option value="custom">Custom</option>
+        </select>
+        <br>
+        <label for="custom_tax_amount">Custom tax amount: </label>
+        <input type="number" id="custom_tax_amount" name="custom_tax_amount" oninput="calculate()">
+        <br>
     </div>
     <div id="outputs">
         <label for="date_retirement">Retirement date: </label><span id="date_retirement"></span>
         <br>
         <label for="months_retirement">Months until retirement: </label><span id="months_retirement"></span>
+        <br>
+        <label for="tax_amount">Tax for purchase: </label><span id="tax_amount"></span><span class="currency-symbol">€</span>
     </div>
 
 </form>
@@ -74,6 +87,8 @@ If not, see <https://www.gnu.org/licenses/>.
     readParameter('rent', URL_PARAMS, 1000, 0)
     readParameter('birth_date', URL_PARAMS, '2001-09-11')
     readParameter('retirement_age', URL_PARAMS, 67, 18, 200)
+    readSelection('taxes', URL_PARAMS)
+    readParameter('custom_tax_amount', URL_PARAMS, 0, 0)
     calculate()
 </script>
 

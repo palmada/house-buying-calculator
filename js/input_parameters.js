@@ -19,14 +19,23 @@ If not, see <https://www.gnu.org/licenses/>.
  * @param max The maximum acceptable value
  */
 function readParameter(id, url_params, default_value, min = 0, max = Number. MAX_VALUE) {
-    let value = default_value
+    let value = default_value;
 
     if (url_params.has(id)) {
-        value = url_params.get(id)
+        value = url_params.get(id);
     }
 
-    if (value < min || value > max) value = default_value
+    if (value < min || value > max) value = default_value;
 
-    document.getElementById(id).value = value
+    document.getElementById(id).value = value;
 }
 
+function readSelection(id, url_params) {
+    let value = 0;
+
+    if (url_params.has(id)) {
+        value = url_params.get(id);
+    }
+
+    document.getElementById(id).selected = value;
+}

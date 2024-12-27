@@ -22,13 +22,7 @@ function calculate() {
 
     let today = new Date();
 
-    let months_until_retirement = (retirement_date.getFullYear() - today.getFullYear()) * 12;
-    months_until_retirement -= today.getMonth();
-    months_until_retirement += retirement_date.getMonth();
-    months_until_retirement -= 1;
-    if (months_until_retirement <= 0) {
-        months_until_retirement = 0
-    }
+    let months_until_retirement = get_month_difference(retirement_date, today);
 
     document.getElementById('months_retirement').innerHTML = months_until_retirement.toString();
 
@@ -48,4 +42,145 @@ function calculate() {
     }
 
     document.getElementById('tax_amount').innerHTML = tax_amount.toString();
+
+    let interest_rate = parseFloat(document.getElementById("interest_rate").value);
+    let monthly_interest_rate = interest_rate / 1200;
+    let current_savings = parseFloat(document.getElementById("savings").value);
+    let monthly_savings =  parseFloat(document.getElementById("monthly_savings").value);
+
+    let simulations = [];
+
+    for (let month_index = 1; month_index <= months_until_retirement; month_index++) {
+
+        let simulation = new MortgageSimulation(
+            month_index,
+            retirement_date,
+            house_price,
+            tax_amount,
+            monthly_interest_rate,
+            current_savings,
+            monthly_savings
+        )
+        simulations.push(simulation);
+    }
+}
+
+/**
+ * Calculates the monthly payment amount on a mortgage. Assumes payments are monthly and paid at the end of the month.
+ *
+ * @param interest_rate Monthly interest rate
+ * @param n_months Number of months for the mortgage duration
+ * @param loan_value The total amount to be loaned
+ * @returns {number}
+ */
+function payment(interest_rate, n_months, loan_value) {
+    if (interest_rate <= 0) {
+        return loan_value/n_months;
+    }
+
+    let interest_factor = Math.pow(1 + interest_rate, n_months);
+    return interest_rate * (loan_value * interest_factor) / (interest_factor - 1);
+}
+
+/**
+ * Calculates the cumulative interested paid over the total duration of a mortgage.
+ *
+ * @param interest_rate Monthly interest rate
+ * @param n_months Number of months for the mortgage duration
+ * @param loan_value The total amount to be loaned
+ * @param monthly_payment The monthly payments (calculate with payment())
+ * @returns {number}
+ */
+function total_mortgage_interest(interest_rate, n_months, loan_value, monthly_payment) {
+    if (interest_rate <= 0) {
+        return 0;
+    }
+
+    let total_interest = loan_value;
+
+    for (let month = 2; month <= n_months; month++) {
+        let term = Math.pow(1 + interest_rate, month - 1);
+        total_interest += loan_value * term - monthly_payment * (term - 1) / interest_rate;
+    }
+
+    return total_interest * interest_rate;
+}
+
+/**
+ * Calculates the difference in the number of months between two Date objects
+ *
+ * @returns {number}
+ */
+function get_month_difference(date_a, date_b) {
+    let difference_months = (date_a.getFullYear() - date_b.getFullYear()) * 12;
+    difference_months -= date_b.getMonth();
+    difference_months += date_a.getMonth();
+    difference_months -= 1;
+    if (difference_months <= 0) {
+        difference_months = 0
+    }
+
+    return difference_months;
+}
+
+
+/**
+ * Represents the calculation result for a given month in the time series.
+ */
+class MortgageSimulation {
+    date;
+    savings;
+    deposit;
+    deposit_percentage;
+    mortgage_payment;
+    total_interest_on_mortgage;
+    mortgage_duration;
+    mortgage_principal_amount;
+
+    /**
+     * Simulates a mortgage taken on X months into the future.
+     *
+     * @param months The number of months between today and this calculation
+     * @param retirement_date The date for the retirement
+     * @param house_price The target house price
+     * @param tax_amount The amount of tax and fees needed to pay for the target house price
+     * @param monthly_interest_rate The monthly interest rate (annual interest rate / 12, as rate, not percentage)
+     * @param starting_savings The current savings as of today
+     * @param monthly_savings The monthly amount you can save
+     */
+    constructor(months, retirement_date, house_price, tax_amount, monthly_interest_rate,
+                starting_savings, monthly_savings) {
+        this.date = new Date();
+        this.date.setMonth(this.date.getMonth() + months);
+
+        this.savings = starting_savings + (months * monthly_savings)
+
+        this.deposit = this.savings - tax_amount;
+
+        if (this.savings >= house_price + tax_amount) {
+            this.mortgage_principal_amount = 0;
+            this.deposit_percentage = 100;
+            this.mortgage_duration = 0;
+            this.mortgage_payment = 0;
+            this.total_interest_on_mortgage = 0;
+        }
+        else {
+            this.mortgage_principal_amount = this.mortgage_principal_amount = house_price - this.deposit;
+
+            this.deposit_percentage = (this.deposit / house_price) * 100;
+
+            this.mortgage_duration = get_month_difference(retirement_date, this.date);
+
+            this.mortgage_payment = payment(monthly_interest_rate,
+                this.mortgage_duration,
+                this.mortgage_principal_amount
+            );
+
+            this.total_interest_on_mortgage = total_mortgage_interest(monthly_interest_rate,
+                this.mortgage_duration,
+                this.mortgage_principal_amount,
+                this.mortgage_payment
+            );
+        }
+    }
 }

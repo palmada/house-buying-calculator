@@ -47,8 +47,11 @@ function calculate() {
     let monthly_interest_rate = interest_rate / 1200;
     let current_savings = parseFloat(document.getElementById("savings").value);
     let monthly_savings =  parseFloat(document.getElementById("monthly_savings").value);
+    let rent = parseFloat(document.getElementById("rent").value);
 
     let simulations = [];
+    let loss_to_rent = rent;
+    let total_costs = []
 
     for (let month_index = 1; month_index <= months_until_retirement; month_index++) {
 
@@ -62,6 +65,12 @@ function calculate() {
             monthly_savings
         )
         simulations.push(simulation);
+
+        total_costs.push(simulation.total_interest_on_mortgage + loss_to_rent + tax_amount);
+
+        if (simulation.savings < house_price + tax_amount){
+            loss_to_rent += rent;
+        }
     }
 }
 

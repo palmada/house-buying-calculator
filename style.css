@@ -9,6 +9,15 @@ You should have received a copy of the GNU General Public License along with the
 If not, see <https://www.gnu.org/licenses/>.
 */
 
+html, body {
+    padding: 5px;
+    margin: 5px;
+}
+
+input, span {
+    margin: 4px;
+}
+
 body {
     font-family: "Quicksand", sans-serif;
     font-optical-sizing: auto;

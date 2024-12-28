@@ -13,16 +13,13 @@ If not, see <https://www.gnu.org/licenses/>.
  * This is the main calculation function that updates the outputs based on the inputs.
  */
 function calculate() {
-    let birth_date = document.getElementById("birth_date").value;
+    let birth_date = moment(document.getElementById("birth_date").value);
     let retirement_age = parseInt(document.getElementById("retirement_age").value);
-    let retirement_date = new Date(birth_date);
-    retirement_date.setFullYear(retirement_date.getFullYear() + retirement_age);
+    let retirement_date = moment(birth_date).add(retirement_age, 'years');
 
-    document.getElementById("date_retirement").innerHTML = retirement_date.toLocaleDateString("en-GB");
+    document.getElementById("date_retirement").innerHTML = retirement_date.format('ll');
 
-    let today = new Date();
-
-    let months_until_retirement = get_month_difference(retirement_date, today);
+    let months_until_retirement = retirement_date.diff(moment(), 'months');
 
     document.getElementById('months_retirement').innerHTML = months_until_retirement.toString();
 
@@ -82,7 +79,7 @@ function calculate() {
         }
 
         simulations.push(simulation);
-        dates.push(simulation.date.toLocaleDateString("en-GB"));
+        dates.push(simulation.date.format('ll'));
         let total_cost = simulation.total_interest_on_mortgage + loss_to_rent + tax_amount;
         total_costs.push(total_cost.toFixed(0));
         if (typeof min_deposit != 'undefined' && total_cost < min_cost) {
@@ -110,7 +107,7 @@ function calculate() {
     buildTable(simulations, total_costs, currency);
 
     document.getElementById('min_cost').innerHTML = min_cost.toFixed(2);
-    document.getElementById('min_cost_date').innerHTML = min_cost_simulation.date.toLocaleDateString("en-GB");
+    document.getElementById('min_cost_date').innerHTML = min_cost_simulation.date.format('ll');
     document.getElementById('min_cost_deposit').innerHTML = min_cost_simulation.deposit_percentage.toFixed(2);
 
     chart.data.labels = [];
@@ -147,7 +144,7 @@ function buildTable(simulations, total_costs, currency) {
         let total_cost = total_costs[s];
 
         let row = "<tr>";
-        row += "<td>" + simulation.date.toLocaleDateString("en-GB") + "</td>";
+        row += "<td>" + simulation.date.format('ll'); + "</td>";
         row += "<td>" + NUMBER_FORMAT.format(simulation.savings) + currency + "</td>";
         row += "<td>" + NUMBER_FORMAT.format(simulation.deposit)  + currency + "</td>";
         row += "<td>" + NUMBER_FORMAT.format(simulation.mortgage_principal_amount)  + currency + "</td>";
@@ -203,24 +200,6 @@ function total_mortgage_interest(interest_rate, n_months, loan_value, monthly_pa
 }
 
 /**
- * Calculates the difference in the number of months between two Date objects
- *
- * @returns {number}
- */
-function get_month_difference(date_a, date_b) {
-    let difference_months = (date_a.getFullYear() - date_b.getFullYear()) * 12;
-    difference_months -= date_b.getMonth();
-    difference_months += date_a.getMonth();
-    difference_months -= 1;
-    if (difference_months <= 0) {
-        difference_months = 0
-    }
-
-    return difference_months;
-}
-
-
-/**
  * Represents the calculation result for a given month in the time series.
  */
 class MortgageSimulation {
@@ -246,14 +225,14 @@ class MortgageSimulation {
      */
     constructor(months, retirement_date, house_price, tax_amount, monthly_interest_rate,
                 starting_savings, monthly_savings) {
-        this.date = new Date();
-        this.date.setMonth(this.date.getMonth() + months);
+        this.date = moment();
+        this.date.add(months, 'months');
 
         this.savings = starting_savings + (months * monthly_savings)
 
         this.deposit = this.savings - tax_amount;
 
-        this.mortgage_duration = get_month_difference(retirement_date, this.date);
+        this.mortgage_duration = retirement_date.diff(this.date, 'months');
 
         if (this.savings >= house_price + tax_amount || this.mortgage_duration <= 0) {
             this.mortgage_principal_amount = 0;

@@ -9,6 +9,8 @@ You should have received a copy of the GNU General Public License along with the
 If not, see <https://www.gnu.org/licenses/>.
 */
 
+const NUMBER_FORMAT = new Intl.NumberFormat();
+
 /**
  * This is the main calculation function that updates the outputs based on the inputs.
  */
@@ -47,13 +49,13 @@ function calculate() {
     let monthly_savings =  parseFloat(document.getElementById("monthly_savings").value);
     let rent = parseFloat(document.getElementById("rent").value);
 
-    let simulations = [];
     let loss_to_rent = rent;
     let dates = []
-    let total_costs = []
+    let total_costs = new Map()
     let min_cost = Number.MAX_VALUE;
-    let min_deposit;
+    let min_deposit_simulation;
     let min_cost_simulation;
+    let buy_outright_date;
 
     let oldest_possible_date = new Date(birth_date);
     // We doubt anyone will live past 120 years of age and least of all be looking to buy a house
@@ -74,15 +76,14 @@ function calculate() {
             monthly_savings
         )
 
-        if (typeof min_deposit == 'undefined' && simulation.deposit_percentage >= min_deposit_percentage) {
-            min_deposit = simulation;
+        if (typeof min_deposit_simulation == 'undefined' && simulation.deposit_percentage >= min_deposit_percentage) {
+            min_deposit_simulation = simulation;
         }
 
-        simulations.push(simulation);
         dates.push(simulation.date.format('ll'));
         let total_cost = simulation.total_interest_on_mortgage + loss_to_rent + tax_amount;
-        total_costs.push(total_cost.toFixed(0));
-        if (typeof min_deposit != 'undefined' && total_cost < min_cost) {
+        total_costs.set(simulation.date, total_cost.toFixed(0));
+        if (typeof min_deposit_simulation != 'undefined' && total_cost < min_cost) {
             min_cost = total_cost;
             min_cost_simulation = simulation;
         }
@@ -91,6 +92,7 @@ function calculate() {
             loss_to_rent += rent;
         }
         else {
+            buy_outright_date = simulation.date;
             // We have enough savings to buy a house, can stop
             stop_condition_found = true;
         }
@@ -106,9 +108,59 @@ function calculate() {
     let currency = document.getElementById("currency").value;
     //buildTable(simulations, total_costs, currency);
 
-    document.getElementById('min_cost').innerHTML = min_cost.toFixed(2);
-    document.getElementById('min_cost_date').innerHTML = min_cost_simulation.date.format('ll');
-    document.getElementById('min_cost_deposit').innerHTML = min_cost_simulation.deposit_percentage.toFixed(2);
+    let scenario_1 =  document.getElementById('scenario_1');
+    let scenario_2 =  document.getElementById('scenario_2');
+
+    let can_get_mortgage = typeof min_deposit_simulation != 'undefined'
+        && min_deposit_simulation.date < retirement_date;
+
+    if (can_get_mortgage) {
+        if (min_cost_simulation.date <= min_deposit_simulation.date) {
+            scenario_1.innerHTML = "<b>Mortage</b><br>" +
+                "You will save the most by buying a house as soon as you can afford it.<br>" +
+                "The calculations are for <b>" + min_cost_simulation.date.format('ll') + "</b><br>" +
+                " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" + ".<br>" +
+                " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.mortgage_payment)) + currency + "<br>" +
+                " over a " + NUMBER_FORMAT.format((min_cost_simulation.mortgage_duration/ 12).toFixed(1)) +
+                " year term.<br>" +
+                "Your total cost (rent until the date, mortgage interest and taxes) will be " +
+                NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + "."
+            ;
+        }
+        else {
+            scenario_1.innerHTML = "<b>Mortage</b><br>" +
+                "You will save the most by waiting a bit before buying a house.<br>" +
+                "This will be on <b>" + min_cost_simulation.date.format('ll') + "</b><br>" +
+                " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" + ",<br>" +
+                " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.mortgage_payment)) + currency + "<br>" +
+                " over a " + NUMBER_FORMAT.format((min_cost_simulation.mortgage_duration/ 12).toFixed(1)) +
+                " year term.<br>" +
+                "Your total cost (rent until the date, mortgage interest and taxes) will be " +
+                NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + "."
+            ;
+        }
+    }
+    else {
+        scenario_1.innerHTML = "<b>Mortage</b><br>" +
+        "Will not be able to save enough for the deposit of a mortgage before retirement.<br>" +
+            "Most banks do not lend into retirement."
+    }
+
+    if (typeof buy_outright_date != 'undefined'  ) {
+        let rent_paid = buy_outright_date.diff(moment(), 'months') * rent;
+        scenario_2.innerHTML = "<b>Buying outright</b><br>" +
+            "You'll be able to buy a house just by saving (i.e. no mortgage) on " +
+            buy_outright_date.format('ll') + " which is <b>" +
+            moment(buy_outright_date).fromNow() + "</b>.<br>You will be " + buy_outright_date.diff(birth_date, 'years') +
+            " years old and have spent " + NUMBER_FORMAT.format(rent_paid + tax_amount) + currency +
+            " on rent and taxes. <br>";
+    }
+    else {
+        scenario_2.innerHTML =  "<b>Buying outright</b><br>" +
+            "Your savings per month are not enough to pay outright " +
+            "for a house of that cost before you are 120 years old. You will have spent " +
+            NUMBER_FORMAT.format(Math.round(loss_to_rent)) + currency + " on rent.";
+    }
 
     chart.data.labels = [];
     chart.data.datasets.forEach((dataset) => {
@@ -116,7 +168,7 @@ function calculate() {
     });
 
     chart.data.labels = dates;
-    chart.data.datasets[0].data = total_costs;
+    chart.data.datasets[0].data = Array.from(total_costs.values());
     chart.update();
 }
 
@@ -131,8 +183,6 @@ const TABLE_HEADER = '<tr>' +
     '<th>Total interest</th>' +
     '<th>Total cost</th>' +
     '</tr>'
-
-const NUMBER_FORMAT = new Intl.NumberFormat();
 
 function buildTable(simulations, total_costs, currency) {
     let simulationsTable = document.getElementById('simulationsTable');
@@ -236,7 +286,7 @@ class MortgageSimulation {
 
         if (this.savings >= house_price + tax_amount || this.mortgage_duration <= 0) {
             this.mortgage_principal_amount = 0;
-            this.deposit_percentage = 100;
+            this.deposit_percentage = -1;
             this.mortgage_duration = 0;
             this.mortgage_payment = 0;
             this.total_interest_on_mortgage = 0;

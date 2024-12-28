@@ -44,6 +44,7 @@ function calculate() {
     document.getElementById('tax_amount').innerHTML = tax_amount.toString();
 
     let interest_rate = parseFloat(document.getElementById("interest_rate").value);
+    let min_deposit_percentage = parseFloat(document.getElementById("min_deposit").value);
     let monthly_interest_rate = interest_rate / 1200;
     let current_savings = parseFloat(document.getElementById("savings").value);
     let monthly_savings =  parseFloat(document.getElementById("monthly_savings").value);
@@ -54,6 +55,7 @@ function calculate() {
     let dates = []
     let total_costs = []
     let min_cost = Number.MAX_VALUE;
+    let min_deposit;
     let min_cost_simulation;
 
     let oldest_possible_date = new Date(birth_date);
@@ -62,6 +64,7 @@ function calculate() {
 
     let stop_condition_found = false;
     let month_index = 1;
+
     while ( ! stop_condition_found) {
 
         let simulation = new MortgageSimulation(
@@ -73,11 +76,16 @@ function calculate() {
             current_savings,
             monthly_savings
         )
+
+        if (typeof min_deposit == 'undefined' && simulation.deposit_percentage >= min_deposit_percentage) {
+            min_deposit = simulation;
+        }
+
         simulations.push(simulation);
         dates.push(simulation.date.toLocaleDateString("en-GB"));
         let total_cost = simulation.total_interest_on_mortgage + loss_to_rent + tax_amount;
         total_costs.push(total_cost.toFixed(0));
-        if (total_cost < min_cost) {
+        if (typeof min_deposit != 'undefined' && total_cost < min_cost) {
             min_cost = total_cost;
             min_cost_simulation = simulation;
         }

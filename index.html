@@ -58,7 +58,10 @@ If not, see <https://www.gnu.org/licenses/>.
         <label for="interest_rate">Interest rate:</label>
         <input type="number" id="interest_rate" name="interest_rate" step="0.1" oninput="calculate()">%
         <br>
-        <label for="rent">Rent:</label>
+        <label for="min_deposit">Minimum deposit required by bank:</label>
+        <input type="number" id="min_deposit" name="min_deposit" oninput="calculate()">%
+        <br>
+        <label for="rent">Current rent:</label>
         <input type="number" id="rent" name="rent" step="100" oninput="calculate()">
         <span class="currency-symbol">€</span>
         <br>
@@ -117,6 +120,7 @@ If not, see <https://www.gnu.org/licenses/>.
     readParameter('savings', URL_PARAMS, 1000, 0);
     readParameter('monthly_savings', URL_PARAMS, 100, 1);
     readParameter('interest_rate', URL_PARAMS, 3.5, 0.01, 100);
+    readParameter('min_deposit', URL_PARAMS, 10, 0, 100);
     readParameter('rent', URL_PARAMS, 1000, 0);
     readParameter('birth_date', URL_PARAMS, '2001-09-11');
     readParameter('retirement_age', URL_PARAMS, 67, 18, 200);

@@ -81,6 +81,9 @@ function calculate() {
         }
     }
 
+    let currency = document.getElementById("currency").value;
+    buildTable(simulations, total_costs, currency);
+
     document.getElementById('min_cost').innerHTML = min_cost.toFixed(2);
     document.getElementById('min_cost_date').innerHTML = min_cost_simulation.date.toLocaleDateString("en-GB");
     document.getElementById('min_cost_deposit').innerHTML = min_cost_simulation.deposit_percentage.toFixed(2);
@@ -93,7 +96,44 @@ function calculate() {
     chart.data.labels = dates;
     chart.data.datasets[0].data = total_costs;
     chart.update();
+}
 
+const TABLE_HEADER = '<tr>' +
+    '<th>Date</th>' +
+    '<th>Savings</th>' +
+    '<th>Deposit</th>' +
+    '<th>Mortgage</th>' +
+    '<th>Deposit %</th>' +
+    '<th>Monthly payment</th>' +
+    '<th>Mortgage length</th>' +
+    '<th>Total interest</th>' +
+    '<th>Total cost</th>' +
+    '</tr>'
+
+const NUMBER_FORMAT = new Intl.NumberFormat();
+
+function buildTable(simulations, total_costs, currency) {
+    let simulationsTable = document.getElementById('simulationsTable');
+    simulationsTable.innerHTML = '';
+    simulationsTable.innerHTML += TABLE_HEADER;
+
+    for (let s = 0; s < simulations.length; s++) {
+        let simulation = simulations[s];
+        let total_cost = total_costs[s];
+
+        let row = "<tr>";
+        row += "<td>" + simulation.date.toLocaleDateString("en-GB") + "</td>";
+        row += "<td>" + NUMBER_FORMAT.format(simulation.savings) + currency + "</td>";
+        row += "<td>" + NUMBER_FORMAT.format(simulation.deposit)  + currency + "</td>";
+        row += "<td>" + NUMBER_FORMAT.format(simulation.mortgage_principal_amount)  + currency + "</td>";
+        row += "<td>" + simulation.deposit_percentage.toFixed(2)   + "%</td>";
+        row += "<td>" + NUMBER_FORMAT.format(simulation.mortgage_payment.toFixed(2))  + currency + "</td>";
+        row += "<td>" + NUMBER_FORMAT.format((simulation.mortgage_duration / 12).toFixed(1)) + " years</td>";
+        row += "<td>" + NUMBER_FORMAT.format(simulation.total_interest_on_mortgage.toFixed(0))  + currency + "</td>";
+        row += "<td>" + NUMBER_FORMAT.format(total_cost) + currency + "</td>";
+        row += "</tr>";
+        simulationsTable.innerHTML += row;
+    }
 }
 
 /**

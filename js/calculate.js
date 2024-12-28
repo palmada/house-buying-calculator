@@ -228,7 +228,9 @@ class MortgageSimulation {
 
         this.deposit = this.savings - tax_amount;
 
-        if (this.savings >= house_price + tax_amount) {
+        this.mortgage_duration = get_month_difference(retirement_date, this.date);
+
+        if (this.savings >= house_price + tax_amount || this.mortgage_duration <= 0) {
             this.mortgage_principal_amount = 0;
             this.deposit_percentage = 100;
             this.mortgage_duration = 0;
@@ -239,8 +241,6 @@ class MortgageSimulation {
             this.mortgage_principal_amount = this.mortgage_principal_amount = house_price - this.deposit;
 
             this.deposit_percentage = (this.deposit / house_price) * 100;
-
-            this.mortgage_duration = get_month_difference(retirement_date, this.date);
 
             this.mortgage_payment = payment(monthly_interest_rate,
                 this.mortgage_duration,

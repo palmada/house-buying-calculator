@@ -32,7 +32,14 @@ If not, see <https://www.gnu.org/licenses/>.
 <h1>House buying calculator</h1>
 
 <form>
-    <div id="inputs">
+    <table>
+    <tr>
+        <th>Inputs</th>
+        <th>Calculated values</th>
+        <th>Chart</th>
+    </tr>
+    <tr>
+    <td>
         <label for="currency">Currency (decorative only):</label>
         <input type="text" id="currency" name="currency" value="€" oninput="updateCurrency()">
         <br>
@@ -70,8 +77,8 @@ If not, see <https://www.gnu.org/licenses/>.
         <label for="custom_tax_amount">Custom tax amount: </label>
         <input type="number" id="custom_tax_amount" name="custom_tax_amount" step="1000" oninput="calculate()">
         <br>
-    </div>
-    <div id="outputs">
+    </td>
+    <td>
         <label for="date_retirement">Retirement date: </label><span id="date_retirement"></span>
         <br>
         <label for="months_retirement">Months until retirement: </label><span id="months_retirement"></span>
@@ -83,11 +90,13 @@ If not, see <https://www.gnu.org/licenses/>.
         <label for="min_cost_date">You should buy on: </label><span id="min_cost_date"></span>
         <br>
         <label for="min_cost_deposit">By then you'll have a deposit of </label><span id="min_cost_deposit"></span>%
-    </div>
+    </td>
+    <td>
+        <canvas id="totalCostChart" style="width: 100%; height: 100%;"></canvas>
+    </td>
+    </tr>
+    </table>
 
-    <div id="graph">
-        <canvas id="totalCostChart" style="width: 100%; max-width: 700px; height: 100%; max-height: 350px"></canvas>
-    </div>
     <div id="table">
         <table id="simulationsTable"></table>
     </div>

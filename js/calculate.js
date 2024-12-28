@@ -51,6 +51,7 @@ function calculate() {
 
     let simulations = [];
     let loss_to_rent = rent;
+    let dates = []
     let total_costs = []
     let min_cost = Number.MAX_VALUE;
     let min_cost_simulation;
@@ -67,9 +68,9 @@ function calculate() {
             monthly_savings
         )
         simulations.push(simulation);
-
+        dates.push(simulation.date.toLocaleDateString("en-GB"));
         let total_cost = simulation.total_interest_on_mortgage + loss_to_rent + tax_amount;
-        total_costs.push(total_cost);
+        total_costs.push(total_cost.toFixed(0));
         if (total_cost < min_cost) {
             min_cost = total_cost;
             min_cost_simulation = simulation;
@@ -83,6 +84,16 @@ function calculate() {
     document.getElementById('min_cost').innerHTML = min_cost.toFixed(2);
     document.getElementById('min_cost_date').innerHTML = min_cost_simulation.date.toLocaleDateString("en-GB");
     document.getElementById('min_cost_deposit').innerHTML = min_cost_simulation.deposit_percentage.toFixed(2);
+
+    chart.data.labels = [];
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data = [];
+    });
+
+    chart.data.labels = dates;
+    chart.data.datasets[0].data = total_costs;
+    chart.update();
+
 }
 
 /**

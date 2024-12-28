@@ -20,6 +20,8 @@ If not, see <https://www.gnu.org/licenses/>.
 <script src="js/taxes.js"></script>
 <script src="js/calculate.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <body>
 
 <h1>House buying calculator</h1>
@@ -78,6 +80,10 @@ If not, see <https://www.gnu.org/licenses/>.
         <label for="min_cost_deposit">By then you'll have a deposit of </label><span id="min_cost_deposit"></span>%
     </div>
 
+    <div id="graph">
+        <canvas id="totalCostChart" style="width: 100%; max-width: 700px; height: 100%; max-height: 350px"></canvas>
+    </div>
+
 </form>
 
 <div id="copyright_footer">
@@ -90,16 +96,36 @@ If not, see <https://www.gnu.org/licenses/>.
 
 <script>
     const URL_PARAMS = new URLSearchParams(window.location.search);
-    readParameter('house_price', URL_PARAMS, 100_000, 1000)
-    readParameter('savings', URL_PARAMS, 1000, 0)
-    readParameter('monthly_savings', URL_PARAMS, 100, 1)
-    readParameter('interest_rate', URL_PARAMS, 3.5, 0.01, 100)
-    readParameter('rent', URL_PARAMS, 1000, 0)
-    readParameter('birth_date', URL_PARAMS, '2001-09-11')
-    readParameter('retirement_age', URL_PARAMS, 67, 18, 200)
-    readSelection('taxes', URL_PARAMS)
-    readParameter('custom_tax_amount', URL_PARAMS, 0, 0)
-    calculate()
+    readParameter('house_price', URL_PARAMS, 100_000, 1000);
+    readParameter('savings', URL_PARAMS, 1000, 0);
+    readParameter('monthly_savings', URL_PARAMS, 100, 1);
+    readParameter('interest_rate', URL_PARAMS, 3.5, 0.01, 100);
+    readParameter('rent', URL_PARAMS, 1000, 0);
+    readParameter('birth_date', URL_PARAMS, '2001-09-11');
+    readParameter('retirement_age', URL_PARAMS, 67, 18, 200);
+    readSelection('taxes', URL_PARAMS);
+    readParameter('custom_tax_amount', URL_PARAMS, 0, 0);
+
+    let chart = new Chart('totalCostChart', {
+        type: "line",
+        data: {
+            labels: [1],
+            datasets: [{
+                data: [1],
+                borderColor: "red",
+                fill: false
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    calculate();
 </script>
 
 </html>

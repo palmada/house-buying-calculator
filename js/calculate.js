@@ -56,7 +56,13 @@ function calculate() {
     let min_cost = Number.MAX_VALUE;
     let min_cost_simulation;
 
-    for (let month_index = 1; month_index <= months_until_retirement; month_index++) {
+    let oldest_possible_date = new Date(birth_date);
+    // We doubt anyone will live past 120 years of age and least of all be looking to buy a house
+    oldest_possible_date.setFullYear(oldest_possible_date.getFullYear() + 120);
+
+    let stop_condition_found = false;
+    let month_index = 1;
+    while ( ! stop_condition_found) {
 
         let simulation = new MortgageSimulation(
             month_index,
@@ -76,9 +82,20 @@ function calculate() {
             min_cost_simulation = simulation;
         }
 
-        if (simulation.savings < house_price + tax_amount){
+        if (simulation.savings < house_price + tax_amount) {
             loss_to_rent += rent;
         }
+        else {
+            // We have enough savings to buy a house, can stop
+            stop_condition_found = true;
+        }
+
+        if (simulation.date >= oldest_possible_date) {
+            // We're likely dead now...
+            stop_condition_found = true;
+        }
+
+        month_index++
     }
 
     let currency = document.getElementById("currency").value;

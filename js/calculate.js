@@ -104,7 +104,7 @@ function calculate() {
     }
 
     let currency = document.getElementById("currency").value;
-    buildTable(simulations, total_costs, currency);
+    //buildTable(simulations, total_costs, currency);
 
     document.getElementById('min_cost').innerHTML = min_cost.toFixed(2);
     document.getElementById('min_cost_date').innerHTML = min_cost_simulation.date.format('ll');

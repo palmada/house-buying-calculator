@@ -27,6 +27,7 @@ If not, see <https://www.gnu.org/licenses/>.
 <script src="js/parameters.js"></script>
 <script src="js/taxes.js"></script>
 <script src="js/calculate.js"></script>
+<script src="js/validate.js"></script>
 
 <body>
 
@@ -67,7 +68,7 @@ If not, see <https://www.gnu.org/licenses/>.
             <span class="currency-symbol">€</span>
             <br>
             <label for="birth_date">Birthdate:</label>
-            <input type="date" id="birth_date" name="birth_date" oninput="calculate()">
+            <input type="date" id="birth_date" name="birth_date">
             <br>
             <label for="retirement_age">Retirement age:</label>
             <input type="number" id="retirement_age" name="retirement_age" oninput="calculate()">
@@ -126,6 +127,8 @@ If not, see <https://www.gnu.org/licenses/>.
 
 <script>
     const URL_PARAMS = new URLSearchParams(window.location.search);
+    const TODAY = DateTime.now();
+
     readParameter('house_price', URL_PARAMS, 100_000, 1000);
     readParameter('savings', URL_PARAMS, 1000, 0);
     readParameter('monthly_savings', URL_PARAMS, 100, 1);
@@ -137,6 +140,8 @@ If not, see <https://www.gnu.org/licenses/>.
     readParameter('max_mortgage_length', URL_PARAMS, 35, 1);
     readSelection('taxes', URL_PARAMS);
     readParameter('custom_tax_amount', URL_PARAMS, 0, 0);
+
+    document.getElementById('birth_date').setAttribute('max', TODAY.toISODate());
 
     Chart.defaults.font.family = 'Quicksand';
     let chart = new Chart('totalCostChart', {
@@ -163,6 +168,18 @@ If not, see <https://www.gnu.org/licenses/>.
     });
 
     calculate();
+
+    let addValidation = (id, defaultValue) => {
+        document.getElementById(id).oninput = () => {
+            validate(id, defaultValue);
+            calculate();
+        };
+    }
+
+    // Default birthdate if someone has entered a birthdate in the future
+    const DEFAULT_BIRTH_DATE = TODAY.minus({years: 30}).toISODate()
+    addValidation('birth_date', DEFAULT_BIRTH_DATE);
+
 </script>
 
 </html>

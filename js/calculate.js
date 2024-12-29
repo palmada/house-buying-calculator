@@ -86,7 +86,7 @@ function calculate() {
         }
 
         dates.push(simulation.date.toLocaleString(DATE_MED));
-        let total_cost = simulation.total_interest_on_mortgage + loss_to_rent + tax_amount;
+        let total_cost = simulation.total_interest + loss_to_rent + tax_amount;
         total_costs.set(simulation.date, total_cost.toFixed(0));
         if (typeof min_deposit_simulation != 'undefined' && total_cost < min_cost) {
             min_cost = total_cost;
@@ -125,8 +125,8 @@ function calculate() {
                 "You will save the most by buying a house as soon as you can afford it.<br>" +
                 "The calculations are for <b>" + min_cost_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
                 " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" + ".<br>" +
-                " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.mortgage_payment)) + currency + "<br>" +
-                " over a " + NUMBER_FORMAT.format((min_cost_simulation.mortgage_duration/ 12).toFixed(1)) +
+                " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.monthly_payment)) + currency + "<br>" +
+                " over a " + NUMBER_FORMAT.format((min_cost_simulation.duration/ 12).toFixed(1)) +
                 " year term, ending " + min_cost_simulation.end_date.toLocaleString(DATE_MED) +
                 ".<br>" +
                 "Your total cost (rent until the date, mortgage interest and taxes) will be " +
@@ -138,8 +138,8 @@ function calculate() {
                 "You will save the most by waiting a bit before buying a house.<br>" +
                 "This will be on <b>" + min_cost_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
                 " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" + ",<br>" +
-                " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.mortgage_payment)) + currency + "<br>" +
-                " over a " + NUMBER_FORMAT.format((min_cost_simulation.mortgage_duration/ 12).toFixed(1)) +
+                " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.monthly_payment)) + currency + "<br>" +
+                " over a " + NUMBER_FORMAT.format((min_cost_simulation.duration/ 12).toFixed(1)) +
                 " year term, ending " + min_cost_simulation.end_date.toLocaleString(DATE_MED) +
                 "<br>" +
                 "Your total cost (rent until the date, mortgage interest and taxes) will be " +
@@ -266,10 +266,10 @@ class MortgageSimulation {
     savings;
     deposit;
     deposit_percentage;
-    mortgage_payment;
-    total_interest_on_mortgage;
-    mortgage_duration;
-    mortgage_principal_amount;
+    monthly_payment;
+    total_interest;
+    duration;
+    principal_amount;
 
     /**
      * Simulates a mortgage taken on X months into the future.
@@ -291,31 +291,31 @@ class MortgageSimulation {
 
         this.deposit = this.savings - tax_amount;
 
-        this.mortgage_duration = Math.min(max_duration, retirement_date.diff(this.date, 'months').months);
+        this.duration = Math.min(max_duration, retirement_date.diff(this.date, 'months').months);
 
-        this.end_date = this.date.plus({months: this.mortgage_duration});
+        this.end_date = this.date.plus({months: this.duration});
 
-        if (this.savings >= house_price + tax_amount || this.mortgage_duration <= 0) {
-            this.mortgage_principal_amount = 0;
+        if (this.savings >= house_price + tax_amount || this.duration <= 0) {
+            this.principal_amount = 0;
             this.deposit_percentage = -1;
-            this.mortgage_duration = 0;
-            this.mortgage_payment = 0;
-            this.total_interest_on_mortgage = 0;
+            this.duration = 0;
+            this.monthly_payment = 0;
+            this.total_interest = 0;
         }
         else {
-            this.mortgage_principal_amount = this.mortgage_principal_amount = house_price - this.deposit;
+            this.principal_amount = this.principal_amount = house_price - this.deposit;
 
             this.deposit_percentage = (this.deposit / house_price) * 100;
 
-            this.mortgage_payment = payment(monthly_interest_rate,
-                this.mortgage_duration,
-                this.mortgage_principal_amount
+            this.monthly_payment = payment(monthly_interest_rate,
+                this.duration,
+                this.principal_amount
             );
 
-            this.total_interest_on_mortgage = total_mortgage_interest(monthly_interest_rate,
-                this.mortgage_duration,
-                this.mortgage_principal_amount,
-                this.mortgage_payment
+            this.total_interest = total_mortgage_interest(monthly_interest_rate,
+                this.duration,
+                this.principal_amount,
+                this.monthly_payment
             );
         }
     }

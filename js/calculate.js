@@ -119,13 +119,18 @@ function calculate() {
     let can_get_mortgage = typeof min_deposit_simulation != 'undefined'
         && min_deposit_simulation.date < retirement_date;
 
-    if (can_get_mortgage) {
+    scenario_1.innerHTML = "<b>Mortage</b><br>";
+
+    if (min_cost_simulation.principal_amount <= monthly_savings) {
+        scenario_1.innerHTML += "You'll be able to save quickly enough that it's best to rent until you buy.";
+    }
+    else if (can_get_mortgage) {
         if (min_cost_simulation.date <= min_deposit_simulation.date) {
-            scenario_1.innerHTML = "<b>Mortage</b><br>" +
+            scenario_1.innerHTML +=
                 "You will save the most by buying a house as soon as you can afford it.<br>The calculations are for";
         }
         else {
-            scenario_1.innerHTML = "<b>Mortage</b><br>" +
+            scenario_1.innerHTML +=
                 "You will save the most by waiting a bit before buying a house.<br> This will be on";
         }
 
@@ -142,8 +147,8 @@ function calculate() {
             NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + "."
     }
     else {
-        scenario_1.innerHTML = "<b>Mortage</b><br>" +
-        "Will not be able to save enough for the deposit of a mortgage before retirement.<br>" +
+        scenario_1.innerHTML +=
+            "Will not be able to save enough for the deposit of a mortgage before retirement.<br>" +
             "Most banks do not lend into retirement."
     }
 

@@ -88,6 +88,8 @@ function calculate() {
         dates.push(simulation.date.toLocaleString(DATE_MED));
         let total_cost = simulation.total_interest + loss_to_rent + tax_amount;
         total_costs.set(simulation.date, total_cost.toFixed(0));
+
+        // We only start checkin what is the minimum cost after checking whether we've met the minimum deposit already
         if (typeof min_deposit_simulation != 'undefined' && total_cost < min_cost) {
             min_cost = total_cost;
             min_cost_simulation = simulation;
@@ -115,36 +117,34 @@ function calculate() {
 
     let scenario_1 =  document.getElementById('scenario_1');
     let scenario_2 =  document.getElementById('scenario_2');
+    let scenario_3 =  document.getElementById('scenario_3');
 
     let can_get_mortgage = typeof min_deposit_simulation != 'undefined'
         && min_deposit_simulation.date < retirement_date;
+    
+    scenario_1.innerHTML = "<b>Time to min. deposit mortgage</b><br>";
 
-    scenario_1.innerHTML = "<b>Mortage</b><br>";
-
-    if (min_cost_simulation.principal_amount <= monthly_savings) {
-        scenario_1.innerHTML += "You'll be able to save quickly enough that it's best to rent until you buy.";
-    }
-    else if (can_get_mortgage) {
-        if (min_cost_simulation.date <= min_deposit_simulation.date) {
+    if (can_get_mortgage) {
+        if (min_deposit_simulation.date <= total_costs.keys().next().value) {
             scenario_1.innerHTML +=
-                "You will save the most by buying a house as soon as you can afford it.<br>The calculations are for";
+                "You have enough to get a mortgage already.<br>The calculations are for";
         }
         else {
             scenario_1.innerHTML +=
-                "You will save the most by waiting a bit before buying a house.<br> This will be on";
+                "You will be able to afford the minimum deposit on";
         }
 
         scenario_1.innerHTML +=
-            " <b>" + min_cost_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
-            " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" +
-            " (" + NUMBER_FORMAT.format(Math.round(min_cost_simulation.deposit)) + currency + "),<br>" +
+            " <b>" + min_deposit_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
+            " with a deposit of " + min_deposit_simulation.deposit_percentage.toFixed(2) + "%" +
+            " (" + NUMBER_FORMAT.format(Math.round(min_deposit_simulation.deposit)) + currency + "),<br>" +
             " a monthly payment of "
-            + NUMBER_FORMAT.format(Math.round(min_cost_simulation.monthly_payment)) + currency + ",<br>" +
-            " over a " + NUMBER_FORMAT.format((min_cost_simulation.duration/ 12).toFixed(1)) +
-            " year term, ending " + min_cost_simulation.end_date.toLocaleString(DATE_MED) +
+            + NUMBER_FORMAT.format(Math.round(min_deposit_simulation.monthly_payment)) + currency + ",<br>" +
+            " over a " + NUMBER_FORMAT.format((min_deposit_simulation.duration/ 12).toFixed(1)) +
+            " year term, ending " + min_deposit_simulation.end_date.toLocaleString(DATE_MED) +
             ".<br>" +
             "Your total cost (rent until the date, mortgage interest and taxes) will be " +
-            NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + "."
+            NUMBER_FORMAT.format(total_costs.get(min_deposit_simulation.date)) + currency + "."
     }
     else {
         scenario_1.innerHTML +=
@@ -152,9 +152,39 @@ function calculate() {
             "Most banks do not lend into retirement."
     }
 
+    scenario_2.innerHTML = "<b>Lowest cost mortgage</b><br>";
+
+    if (min_cost_simulation.principal_amount <= monthly_savings) {
+        scenario_2.innerHTML += "You'll be able to save quickly enough that it's best to rent until you buy.";
+    }
+    else if (can_get_mortgage) {
+        if (min_cost_simulation.date <= min_deposit_simulation.date) {
+            scenario_2.innerHTML +=
+                "You will save the most by buying a house as soon as you can afford it.<br>" +
+                "See the calculations for the minimum deposit.";
+        }
+        else {
+            scenario_2.innerHTML +=
+                "You will save the most by waiting a bit before buying a house.<br> This will be on" +
+                " <b>" + min_cost_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
+                " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" +
+                " (" + NUMBER_FORMAT.format(Math.round(min_cost_simulation.deposit)) + currency + "),<br>" +
+                " a monthly payment of "
+                + NUMBER_FORMAT.format(Math.round(min_cost_simulation.monthly_payment)) + currency + ",<br>" +
+                " over a " + NUMBER_FORMAT.format((min_cost_simulation.duration / 12).toFixed(1)) +
+                " year term, ending " + min_cost_simulation.end_date.toLocaleString(DATE_MED) +
+                ".<br>" +
+                "Your total cost (rent until the date, mortgage interest and taxes) will be " +
+                NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + "."
+        }
+    }
+    else {
+        scenario_2.innerHTML = ""; // This is covered by the min deposit scenario.
+    }
+
     if (typeof buy_outright_date != 'undefined'  ) {
         let rent_paid = Math.round(buy_outright_date.diff(DateTime.now(), 'months').months) * rent;
-        scenario_2.innerHTML = "<b>Buying outright</b><br>" +
+        scenario_3.innerHTML = "<b>Buying outright</b><br>" +
             "You'll be able to buy a house just by saving (i.e. no mortgage) on " +
             buy_outright_date.toLocaleString(DATE_MED) + " which is <b>" +
             buy_outright_date.toRelative() + "</b>.<br>You will be " +
@@ -163,7 +193,7 @@ function calculate() {
             " on rent and taxes. <br>";
     }
     else {
-        scenario_2.innerHTML =  "<b>Buying outright</b><br>" +
+        scenario_3.innerHTML =  "<b>Buying outright</b><br>" +
             "Your savings per month are not enough to pay outright " +
             "for a house of that cost before you are 120 years old. You will have spent " +
             NUMBER_FORMAT.format(Math.round(loss_to_rent)) + currency + " on rent.";

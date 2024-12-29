@@ -37,5 +37,5 @@ function readSelection(id, url_params) {
         value = url_params.get(id);
     }
 
-    document.getElementById(id).selected = value;
+    document.getElementById(id).value = value;
 }

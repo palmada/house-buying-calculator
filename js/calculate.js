@@ -122,30 +122,24 @@ function calculate() {
     if (can_get_mortgage) {
         if (min_cost_simulation.date <= min_deposit_simulation.date) {
             scenario_1.innerHTML = "<b>Mortage</b><br>" +
-                "You will save the most by buying a house as soon as you can afford it.<br>" +
-                "The calculations are for <b>" + min_cost_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
-                " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" + ".<br>" +
-                " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.monthly_payment)) + currency + "<br>" +
-                " over a " + NUMBER_FORMAT.format((min_cost_simulation.duration/ 12).toFixed(1)) +
-                " year term, ending " + min_cost_simulation.end_date.toLocaleString(DATE_MED) +
-                ".<br>" +
-                "Your total cost (rent until the date, mortgage interest and taxes) will be " +
-                NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + "."
-            ;
+                "You will save the most by buying a house as soon as you can afford it.<br>The calculations are for";
         }
         else {
             scenario_1.innerHTML = "<b>Mortage</b><br>" +
-                "You will save the most by waiting a bit before buying a house.<br>" +
-                "This will be on <b>" + min_cost_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
-                " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" + ",<br>" +
-                " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.monthly_payment)) + currency + "<br>" +
-                " over a " + NUMBER_FORMAT.format((min_cost_simulation.duration/ 12).toFixed(1)) +
-                " year term, ending " + min_cost_simulation.end_date.toLocaleString(DATE_MED) +
-                "<br>" +
-                "Your total cost (rent until the date, mortgage interest and taxes) will be " +
-                NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + "."
-            ;
+                "You will save the most by waiting a bit before buying a house.<br> This will be on";
         }
+
+        scenario_1.innerHTML +=
+            " <b>" + min_cost_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
+            " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" +
+            " (" + NUMBER_FORMAT.format(Math.round(min_cost_simulation.deposit)) + currency + "),<br>" +
+            " a monthly payment of "
+            + NUMBER_FORMAT.format(Math.round(min_cost_simulation.monthly_payment)) + currency + ",<br>" +
+            " over a " + NUMBER_FORMAT.format((min_cost_simulation.duration/ 12).toFixed(1)) +
+            " year term, ending " + min_cost_simulation.end_date.toLocaleString(DATE_MED) +
+            ".<br>" +
+            "Your total cost (rent until the date, mortgage interest and taxes) will be " +
+            NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + "."
     }
     else {
         scenario_1.innerHTML = "<b>Mortage</b><br>" +

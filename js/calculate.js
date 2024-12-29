@@ -43,7 +43,7 @@ function calculate() {
             }
     }
 
-    document.getElementById('tax_amount').innerHTML = tax_amount.toString();
+    document.getElementById('tax_amount').innerHTML = tax_amount.toFixed(2).toString();
 
     let interest_rate = parseFloat(document.getElementById("interest_rate").value);
     let min_deposit_percentage = parseFloat(document.getElementById("min_deposit").value);

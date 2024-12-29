@@ -51,6 +51,8 @@ function calculate() {
     let current_savings = parseFloat(document.getElementById("savings").value);
     let monthly_savings =  parseFloat(document.getElementById("monthly_savings").value);
     let rent = parseFloat(document.getElementById("rent").value);
+    let max_mortgage_length = parseFloat(document.getElementById("max_mortgage_length").value);
+    max_mortgage_length *= 12; // Convert to months
 
     let loss_to_rent = rent;
     let dates = []
@@ -75,7 +77,8 @@ function calculate() {
             tax_amount,
             monthly_interest_rate,
             current_savings,
-            monthly_savings
+            monthly_savings,
+            max_mortgage_length
         )
 
         if (typeof min_deposit_simulation == 'undefined' && simulation.deposit_percentage >= min_deposit_percentage) {
@@ -275,16 +278,17 @@ class MortgageSimulation {
      * @param monthly_interest_rate The monthly interest rate (annual interest rate / 12, as rate, not percentage)
      * @param starting_savings The current savings as of today
      * @param monthly_savings The monthly amount you can save
+     * @param max_duration Maximum length the bank will give a mortgage for
      */
     constructor(months, retirement_date, house_price, tax_amount, monthly_interest_rate,
-                starting_savings, monthly_savings) {
+                starting_savings, monthly_savings, max_duration) {
         this.date = DateTime.now().plus({months: months});
 
         this.savings = starting_savings + (months * monthly_savings)
 
         this.deposit = this.savings - tax_amount;
 
-        this.mortgage_duration = retirement_date.diff(this.date, 'months').months;
+        this.mortgage_duration = Math.min(max_duration, retirement_date.diff(this.date, 'months').months);
 
         if (this.savings >= house_price + tax_amount || this.mortgage_duration <= 0) {
             this.mortgage_principal_amount = 0;

@@ -72,6 +72,9 @@ If not, see <https://www.gnu.org/licenses/>.
             <label for="retirement_age">Retirement age:</label>
             <input type="number" id="retirement_age" name="retirement_age" oninput="calculate()">
             <br>
+            <label for="max_mortgage_length">Max. mortgage length:</label>
+            <input type="number" id="max_mortgage_length" name="max_mortgage_length" oninput="calculate()">
+            <br>
             <label for="taxes">Country (determines taxes to pay):</label>
             <select id="taxes" name="taxes" oninput="calculate()">
                 <option value="spain">Spain</option>
@@ -123,6 +126,7 @@ If not, see <https://www.gnu.org/licenses/>.
     readParameter('rent', URL_PARAMS, 1000, 0);
     readParameter('birth_date', URL_PARAMS, '2001-09-11');
     readParameter('retirement_age', URL_PARAMS, 67, 18, 200);
+    readParameter('max_mortgage_length', URL_PARAMS, 35, 1);
     readSelection('taxes', URL_PARAMS);
     readParameter('custom_tax_amount', URL_PARAMS, 0, 0);
 

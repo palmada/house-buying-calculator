@@ -24,5 +24,9 @@ function validate(id, defaultValue = 0) {
                 element.value = defaultValue;
             }
             break;
+        default:
+            if (element.value <= 0) {
+                element.value = defaultValue;
+            }
     }
 }

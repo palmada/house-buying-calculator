@@ -127,7 +127,8 @@ function calculate() {
                 " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" + ".<br>" +
                 " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.mortgage_payment)) + currency + "<br>" +
                 " over a " + NUMBER_FORMAT.format((min_cost_simulation.mortgage_duration/ 12).toFixed(1)) +
-                " year term.<br>" +
+                " year term, ending " + min_cost_simulation.end_date.toLocaleString(DATE_MED) +
+                ".<br>" +
                 "Your total cost (rent until the date, mortgage interest and taxes) will be " +
                 NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + "."
             ;
@@ -139,7 +140,8 @@ function calculate() {
                 " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" + ",<br>" +
                 " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.mortgage_payment)) + currency + "<br>" +
                 " over a " + NUMBER_FORMAT.format((min_cost_simulation.mortgage_duration/ 12).toFixed(1)) +
-                " year term.<br>" +
+                " year term, ending " + min_cost_simulation.end_date.toLocaleString(DATE_MED) +
+                "<br>" +
                 "Your total cost (rent until the date, mortgage interest and taxes) will be " +
                 NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + "."
             ;
@@ -260,6 +262,7 @@ function total_mortgage_interest(interest_rate, n_months, loan_value, monthly_pa
  */
 class MortgageSimulation {
     date;
+    end_date;
     savings;
     deposit;
     deposit_percentage;
@@ -289,6 +292,8 @@ class MortgageSimulation {
         this.deposit = this.savings - tax_amount;
 
         this.mortgage_duration = Math.min(max_duration, retirement_date.diff(this.date, 'months').months);
+
+        this.end_date = this.date.plus({months: this.mortgage_duration});
 
         if (this.savings >= house_price + tax_amount || this.mortgage_duration <= 0) {
             this.mortgage_principal_amount = 0;

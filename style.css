@@ -30,6 +30,7 @@ td, th {
 
 .scenario {
     border: 1px solid black;
+    vertical-align: top;
 }
 
 body {

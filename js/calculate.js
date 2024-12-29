@@ -11,17 +11,20 @@ If not, see <https://www.gnu.org/licenses/>.
 
 const NUMBER_FORMAT = new Intl.NumberFormat();
 
+const DateTime = luxon.DateTime;
+const DATE_MED = luxon.DateTime.DATE_MED;
+
 /**
  * This is the main calculation function that updates the outputs based on the inputs.
  */
 function calculate() {
-    let birth_date = moment(document.getElementById("birth_date").value);
+    let birth_date = DateTime.fromISO(document.getElementById("birth_date").value);
     let retirement_age = parseInt(document.getElementById("retirement_age").value);
-    let retirement_date = moment(birth_date).add(retirement_age, 'years');
+    let retirement_date = birth_date.plus({years: retirement_age});
 
-    document.getElementById("date_retirement").innerHTML = retirement_date.format('ll');
+    document.getElementById("date_retirement").innerHTML = retirement_date.toLocaleString(DATE_MED);
 
-    let months_until_retirement = retirement_date.diff(moment(), 'months');
+    let months_until_retirement = Math.round(retirement_date.diff(DateTime.now(), 'months').months);
 
     document.getElementById('months_retirement').innerHTML = months_until_retirement.toString();
 
@@ -57,9 +60,8 @@ function calculate() {
     let min_cost_simulation;
     let buy_outright_date;
 
-    let oldest_possible_date = new Date(birth_date);
     // We doubt anyone will live past 120 years of age and least of all be looking to buy a house
-    oldest_possible_date.setFullYear(oldest_possible_date.getFullYear() + 120);
+    let oldest_possible_date = birth_date.plus({years: 120});
 
     let stop_condition_found = false;
     let month_index = 1;
@@ -80,7 +82,7 @@ function calculate() {
             min_deposit_simulation = simulation;
         }
 
-        dates.push(simulation.date.format('ll'));
+        dates.push(simulation.date.toLocaleString(DATE_MED));
         let total_cost = simulation.total_interest_on_mortgage + loss_to_rent + tax_amount;
         total_costs.set(simulation.date, total_cost.toFixed(0));
         if (typeof min_deposit_simulation != 'undefined' && total_cost < min_cost) {
@@ -118,7 +120,7 @@ function calculate() {
         if (min_cost_simulation.date <= min_deposit_simulation.date) {
             scenario_1.innerHTML = "<b>Mortage</b><br>" +
                 "You will save the most by buying a house as soon as you can afford it.<br>" +
-                "The calculations are for <b>" + min_cost_simulation.date.format('ll') + "</b><br>" +
+                "The calculations are for <b>" + min_cost_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
                 " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" + ".<br>" +
                 " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.mortgage_payment)) + currency + "<br>" +
                 " over a " + NUMBER_FORMAT.format((min_cost_simulation.mortgage_duration/ 12).toFixed(1)) +
@@ -130,7 +132,7 @@ function calculate() {
         else {
             scenario_1.innerHTML = "<b>Mortage</b><br>" +
                 "You will save the most by waiting a bit before buying a house.<br>" +
-                "This will be on <b>" + min_cost_simulation.date.format('ll') + "</b><br>" +
+                "This will be on <b>" + min_cost_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
                 " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" + ",<br>" +
                 " a monthly payment of " + NUMBER_FORMAT.format(Math.round(min_cost_simulation.mortgage_payment)) + currency + "<br>" +
                 " over a " + NUMBER_FORMAT.format((min_cost_simulation.mortgage_duration/ 12).toFixed(1)) +
@@ -147,11 +149,12 @@ function calculate() {
     }
 
     if (typeof buy_outright_date != 'undefined'  ) {
-        let rent_paid = buy_outright_date.diff(moment(), 'months') * rent;
+        let rent_paid = Math.round(buy_outright_date.diff(DateTime.now(), 'months').months) * rent;
         scenario_2.innerHTML = "<b>Buying outright</b><br>" +
             "You'll be able to buy a house just by saving (i.e. no mortgage) on " +
-            buy_outright_date.format('ll') + " which is <b>" +
-            moment(buy_outright_date).fromNow() + "</b>.<br>You will be " + buy_outright_date.diff(birth_date, 'years') +
+            buy_outright_date.toLocaleString(DATE_MED) + " which is <b>" +
+            buy_outright_date.toRelative() + "</b>.<br>You will be " +
+            Math.round(buy_outright_date.diff(birth_date, 'years').years) +
             " years old and have spent " + NUMBER_FORMAT.format(rent_paid + tax_amount) + currency +
             " on rent and taxes. <br>";
     }
@@ -194,7 +197,7 @@ function buildTable(simulations, total_costs, currency) {
         let total_cost = total_costs[s];
 
         let row = "<tr>";
-        row += "<td>" + simulation.date.format('ll'); + "</td>";
+        row += "<td>" + simulation.date.toLocaleString(DATE_MED); + "</td>";
         row += "<td>" + NUMBER_FORMAT.format(simulation.savings) + currency + "</td>";
         row += "<td>" + NUMBER_FORMAT.format(simulation.deposit)  + currency + "</td>";
         row += "<td>" + NUMBER_FORMAT.format(simulation.mortgage_principal_amount)  + currency + "</td>";
@@ -275,14 +278,13 @@ class MortgageSimulation {
      */
     constructor(months, retirement_date, house_price, tax_amount, monthly_interest_rate,
                 starting_savings, monthly_savings) {
-        this.date = moment();
-        this.date.add(months, 'months');
+        this.date = DateTime.now().plus({months: months});
 
         this.savings = starting_savings + (months * monthly_savings)
 
         this.deposit = this.savings - tax_amount;
 
-        this.mortgage_duration = retirement_date.diff(this.date, 'months');
+        this.mortgage_duration = retirement_date.diff(this.date, 'months').months;
 
         if (this.savings >= house_price + tax_amount || this.mortgage_duration <= 0) {
             this.mortgage_principal_amount = 0;

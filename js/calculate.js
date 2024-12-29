@@ -54,6 +54,17 @@ function calculate() {
     let max_mortgage_length = parseFloat(document.getElementById("max_mortgage_length").value);
     max_mortgage_length *= 12; // Convert to months
 
+    let scenario_1 =  document.getElementById('scenario_1');
+    let scenario_2 =  document.getElementById('scenario_2');
+    let scenario_3 =  document.getElementById('scenario_3');
+
+    if (current_savings >= house_price + tax_amount) {
+        scenario_1.innerHTML = "You can already afford the house you want! Congratulations!"
+        scenario_2.innerHTML = "";
+        scenario_3.innerHTML = "";
+        return
+    }
+
     let loss_to_rent = rent;
     let dates = []
     let total_costs = new Map()
@@ -114,10 +125,6 @@ function calculate() {
 
     let currency = document.getElementById("currency").value;
     //buildTable(simulations, total_costs, currency);
-
-    let scenario_1 =  document.getElementById('scenario_1');
-    let scenario_2 =  document.getElementById('scenario_2');
-    let scenario_3 =  document.getElementById('scenario_3');
 
     let can_get_mortgage = typeof min_deposit_simulation != 'undefined'
         && min_deposit_simulation.date < retirement_date;

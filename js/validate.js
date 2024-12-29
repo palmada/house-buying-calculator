@@ -15,8 +15,10 @@ If not, see <https://www.gnu.org/licenses/>.
  *
  * @param id The ID of the input to validate as this only validates one element at a time.
  * @param defaultValue The default value to set if validation fails.
+ * @param min If we're validating a number, the minimum value it should be set to.
+ * @param max If we're validating a number, the maximum value it should be set to.
  */
-function validate(id, defaultValue = 0) {
+function validate(id, defaultValue = 0, min = 0, max = Number.MAX_SAFE_INTEGER) {
     let element = document.getElementById(id);
     switch(id) {
         case 'birth_date':
@@ -24,8 +26,13 @@ function validate(id, defaultValue = 0) {
                 element.value = defaultValue;
             }
             break;
+        case 'taxes':
+            break;
         default:
-            if (element.value <= 0) {
+            if (element.value < min) {
+                element.value = defaultValue;
+            }
+            else if (element.value > max) {
                 element.value = defaultValue;
             }
     }

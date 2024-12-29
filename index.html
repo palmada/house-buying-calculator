@@ -22,6 +22,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://moment.github.io/luxon/global/luxon.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 
 <script src="js/update_currency.js"></script>
 <script src="js/parameters.js"></script>
@@ -126,20 +127,64 @@ If not, see <https://www.gnu.org/licenses/>.
 </body>
 
 <script>
+    const COOKIE_API = Cookies.withAttributes({ path: '/', sameSite: 'Strict', secure: 'true', expires: 60  })
     const URL_PARAMS = new URLSearchParams(window.location.search);
     const TODAY = DateTime.now();
+    // Default birthdate if someone has entered a birthdate in the future
+    const DEFAULT_BIRTH_DATE = TODAY.minus({years: 30}).toISODate()
 
-    readParameter('house_price', URL_PARAMS, 100_000, 1000);
-    readParameter('savings', URL_PARAMS, 1000, 0);
-    readParameter('monthly_savings', URL_PARAMS, 100, 1);
-    readParameter('interest_rate', URL_PARAMS, 3.5, 0.01, 100);
-    readParameter('min_deposit', URL_PARAMS, 10, 0, 100);
-    readParameter('rent', URL_PARAMS, 1000, 0);
-    readParameter('birth_date', URL_PARAMS, '2001-09-11');
-    readParameter('retirement_age', URL_PARAMS, 67, 18, 200);
-    readParameter('max_mortgage_length', URL_PARAMS, 35, 1);
-    readSelection('taxes', URL_PARAMS);
-    readParameter('custom_tax_amount', URL_PARAMS, 0, 0);
+    /**
+     * Sets up input parameters.
+     *
+     * First, reads the input parameters from the URL if set, or a cookie if it exists.
+     * Else, it sets the input element's value to a default value.
+     * It then validates the final value and adds 'oninput' function to validate values, update the cookie,
+     * and finally trigger the simulation.
+     *
+     * @param id The input element ID we're setting up
+     * @param default_value The default value starting for the parameter
+     * @param min For number inputs, the minimum value it should be set to.
+     * @param max For number inputs, the maximum value it should be set to.
+     */
+    let setParameter = (id, default_value = 0, min = 0, max = Number.MAX_SAFE_INTEGER) => {
+        let value = default_value;
+
+        if (URL_PARAMS.has(id)) {
+            // The URL takes precedence
+            value = URL_PARAMS.get(id);
+        }
+        else {
+            // If no URL parameter was passed, we check if a cookie value exists
+            let storedValue = COOKIE_API.get(id);
+            if (storedValue !== undefined) {
+                value = storedValue;
+            }
+        }
+
+        validate(id, value);
+
+        COOKIE_API.set(id, value);
+        let element = document.getElementById(id);
+        element.value = value;
+
+        element.oninput = () => {
+            validate(id, default_value, min, max);
+            COOKIE_API.set(id, element.value)
+            calculate();
+        };
+    }
+
+    setParameter('house_price', 100_000);
+    setParameter('savings', 1000);
+    setParameter('monthly_savings', 100);
+    setParameter('interest_rate', 3.5, 0, 100);
+    setParameter('min_deposit', 10, 0, 100);
+    setParameter('rent', 1000);
+    setParameter('birth_date', DEFAULT_BIRTH_DATE);
+    setParameter('retirement_age', 67, 18, 120);
+    setParameter('max_mortgage_length', 35, 1);
+    setParameter('taxes', 'spain');
+    setParameter('custom_tax_amount', 0, 0);
 
     document.getElementById('birth_date').setAttribute('max', TODAY.toISODate());
 
@@ -168,27 +213,6 @@ If not, see <https://www.gnu.org/licenses/>.
     });
 
     calculate();
-
-    let addValidation = (id, defaultValue = 0) => {
-        document.getElementById(id).oninput = () => {
-            validate(id, defaultValue);
-            calculate();
-        };
-    }
-
-    addValidation('house_price');
-    addValidation('savings');
-    addValidation('monthly_savings');
-    addValidation('interest_rate');
-    addValidation('min_deposit');
-    addValidation('rent');
-    addValidation('retirement_age', 16); // People can retire early... but how early?
-    addValidation('max_mortgage_length', 1);
-    addValidation('custom_tax_amount');
-
-    // Default birthdate if someone has entered a birthdate in the future
-    const DEFAULT_BIRTH_DATE = TODAY.minus({years: 30}).toISODate()
-    addValidation('birth_date', DEFAULT_BIRTH_DATE);
 
 </script>
 

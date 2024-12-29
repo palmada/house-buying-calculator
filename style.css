@@ -42,3 +42,10 @@ body {
 .calculated_values {
     width: 20%;
 }
+
+.copyright_footer {
+    margin-top: 20px;
+    font-weight: 600;
+    font-size: 0.75em;
+    text-align: center;
+}

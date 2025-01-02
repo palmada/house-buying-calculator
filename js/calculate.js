@@ -138,11 +138,12 @@ function calculate() {
         }
         else {
             scenario_1.innerHTML +=
-                "You will be able to afford the minimum deposit on";
+                "You will be able to afford the minimum deposit";
         }
 
         scenario_1.innerHTML +=
-            " <b>" + min_deposit_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
+            " <b>" + min_deposit_simulation.date.toRelative() + "</b> (" +
+            min_deposit_simulation.date.toLocaleString(DATE_MED) + ")<br>" +
             " with a deposit of " + min_deposit_simulation.deposit_percentage.toFixed(2) + "%" +
             " (" + NUMBER_FORMAT.format(Math.round(min_deposit_simulation.deposit)) + currency + "),<br>" +
             " a monthly payment of "
@@ -172,8 +173,9 @@ function calculate() {
         }
         else {
             scenario_2.innerHTML +=
-                "You will save the most by waiting a bit before buying a house.<br> This will be on" +
-                " <b>" + min_cost_simulation.date.toLocaleString(DATE_MED) + "</b><br>" +
+                "You will save the most by waiting a bit before buying a house.<br> This will be" +
+                " <b>" + min_cost_simulation.date.toRelative()+ "</b>" +
+                " (" + min_cost_simulation.date.toLocaleString(DATE_MED) + ")<br>" +
                 " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" +
                 " (" + NUMBER_FORMAT.format(Math.round(min_cost_simulation.deposit)) + currency + "),<br>" +
                 " a monthly payment of "

@@ -1,4 +1,4 @@
-/* © Copyright 2024, Pedro Almada
+/* © Copyright 2024-2025, Pedro Almada
 Licensed under the GPL-3.0-or-later
 
 This file is part of the House buying calculator and is distributed WITHOUT ANY WARRANTY;
@@ -30,6 +30,7 @@ function calculate() {
 
     let house_price = parseFloat(document.getElementById("house_price").value);
     let tax_selection = document.getElementById("taxes").selectedIndex;
+    let custom_tax = false;
     let tax_amount;
 
     switch (tax_selection) {
@@ -37,6 +38,7 @@ function calculate() {
             tax_amount = taxes_spain(house_price);
             break
         default:
+            custom_tax = true;
             tax_amount = parseFloat(document.getElementById("custom_tax_amount").value);
             if (tax_amount < 0 || isNaN(tax_amount) ) {
                 tax_amount = 0;
@@ -47,8 +49,10 @@ function calculate() {
 
     let mortgage_interest_rate = parseFloat(document.getElementById("mortgage_rate").value);
     let savings_interest_rate = parseFloat(document.getElementById("savings_rate").value);
+    let house_price_inflation = parseFloat(document.getElementById("house_price_inflation").value);
     let monthly_mortgage_rate = mortgage_interest_rate / 1200;
     let monthly_savings_rate = savings_interest_rate / 1200;
+    let house_price_growth_factor = 1 + (house_price_inflation / 1200); // Simple monthly multiplier
     let min_deposit_percentage = parseFloat(document.getElementById("min_deposit").value);
     let current_savings = parseFloat(document.getElementById("savings").value);
     let monthly_savings =  parseFloat(document.getElementById("monthly_savings").value);
@@ -74,6 +78,7 @@ function calculate() {
     let min_deposit_simulation;
     let min_cost_simulation;
     let buy_outright_date;
+    let buy_outright_price;
 
     // We doubt anyone will live past 120 years of age and least of all be looking to buy a house
     let oldest_possible_date = birth_date.plus({years: 120});
@@ -82,7 +87,6 @@ function calculate() {
     let month_index = 1;
 
     while ( ! stop_condition_found) {
-
         let simulation = new MortgageSimulation(
             month_index,
             retirement_date,
@@ -100,7 +104,7 @@ function calculate() {
         }
 
         dates.push(simulation.date.toLocaleString(DATE_MED));
-        let total_cost = simulation.total_interest + loss_to_rent + tax_amount;
+        let total_cost = simulation.total_interest + loss_to_rent + tax_amount + house_price;
         total_costs.set(simulation.date, total_cost.toFixed(0));
 
         // We only start checkin what is the minimum cost after checking whether we've met the minimum deposit already
@@ -114,6 +118,7 @@ function calculate() {
         }
         else {
             buy_outright_date = simulation.date;
+            buy_outright_price = house_price;
             // We have enough savings to buy a house, can stop
             stop_condition_found = true;
         }
@@ -121,6 +126,14 @@ function calculate() {
         if (simulation.date >= oldest_possible_date) {
             // We're likely dead now...
             stop_condition_found = true;
+        }
+
+        // Update house price
+        house_price *= house_price_growth_factor;
+
+        if ( ! custom_tax) {
+            // The tax amount will grow with the growth of the house price
+            tax_amount = taxes_spain(house_price);
         }
 
         month_index++
@@ -154,8 +167,10 @@ function calculate() {
             " over a " + NUMBER_FORMAT.format((min_deposit_simulation.duration/ 12).toFixed(1)) +
             " year term, ending " + min_deposit_simulation.end_date.toLocaleString(DATE_MED) +
             ".<br>" +
-            "Your total cost (rent until the date, mortgage interest and taxes) will be " +
-            NUMBER_FORMAT.format(total_costs.get(min_deposit_simulation.date)) + currency + "."
+            "Your total cost will be " +
+            NUMBER_FORMAT.format(total_costs.get(min_deposit_simulation.date)) + currency + ". <br>" +
+            "By then, the house will be valued at " +
+            NUMBER_FORMAT.format(Math.round(min_deposit_simulation.house_price)) + currency + ".";
     }
     else {
         scenario_1.innerHTML +=
@@ -186,29 +201,41 @@ function calculate() {
                 " over a " + NUMBER_FORMAT.format((min_cost_simulation.duration / 12).toFixed(1)) +
                 " year term, ending " + min_cost_simulation.end_date.toLocaleString(DATE_MED) +
                 ".<br>" +
-                "Your total cost (rent until the date, mortgage interest and taxes) will be " +
-                NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + "."
+                "Your total cost will be " +
+                NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + ".<br>" +
+                "By then, the house will be valued at " +
+                NUMBER_FORMAT.format(Math.round(min_cost_simulation.house_price)) + currency + ".";
         }
     }
     else {
         scenario_2.innerHTML = ""; // This is covered by the min deposit scenario.
     }
 
-    if (typeof buy_outright_date != 'undefined'  ) {
+    if (typeof buy_outright_date != 'undefined') {
         let rent_paid = Math.round(buy_outright_date.diff(DateTime.now(), 'months').months) * rent;
+
+        if ( ! custom_tax) {
+            tax_amount = Math.round(taxes_spain(buy_outright_price));
+        }
+
         scenario_3.innerHTML = "<b>Buying outright</b><br>" +
             "You'll be able to buy a house just by saving (i.e. no mortgage) on " +
             buy_outright_date.toLocaleString(DATE_MED) + " which is <b>" +
             buy_outright_date.toRelative() + "</b>.<br>You will be " +
             Math.round(buy_outright_date.diff(birth_date, 'years').years) +
-            " years old and have spent " + NUMBER_FORMAT.format(rent_paid + tax_amount) + currency +
-            " on rent and taxes. <br>";
+            " years old and have spent " + NUMBER_FORMAT.format(rent_paid) + currency +
+            " on rent and " + NUMBER_FORMAT.format(tax_amount) + currency + " on taxes. <br>" +
+            "By then, the house will be valued at " +
+            NUMBER_FORMAT.format(Math.round(buy_outright_price)) + currency + ", and you'll therefore spend " +
+            NUMBER_FORMAT.format(Math.round(buy_outright_price + tax_amount + rent_paid)) + currency + " in total.";
     }
     else {
         scenario_3.innerHTML =  "<b>Buying outright</b><br>" +
             "Your savings per month are not enough to pay outright " +
-            "for a house of that cost before you are 120 years old. You will have spent " +
-            NUMBER_FORMAT.format(Math.round(loss_to_rent)) + currency + " on rent.";
+            " before you are 120 years old.<br>You will have spent " +
+            NUMBER_FORMAT.format(Math.round(loss_to_rent)) + currency +
+            " on rent, and by then the house will be valued at" +
+            NUMBER_FORMAT.format(Math.round(house_price)) + currency + ".";
     }
 
     chart.data.labels = [];
@@ -321,6 +348,7 @@ function compound_interest(starting_value, interest, n_months, monthly_contribut
 class MortgageSimulation {
     date;
     end_date;
+    house_price;
     savings;
     deposit;
     deposit_percentage;
@@ -346,6 +374,7 @@ class MortgageSimulation {
                 monthly_mortgage_rate, monthly_savings_rate,
                 starting_savings, monthly_savings, max_duration) {
         this.date = DateTime.now().plus({months: months});
+        this.house_price = house_price;
 
         this.savings = compound_interest(starting_savings, monthly_savings_rate, months, monthly_savings);
 

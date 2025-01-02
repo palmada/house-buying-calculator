@@ -64,6 +64,9 @@ If not, see <https://www.gnu.org/licenses/>.
             <label for="savings_rate">Savings Interest rate:</label>
             <input type="number" id="savings_rate" name="savings_rate" min="0" step="0.1" oninput="calculate()">%
             <br>
+            <label for="house_price_inflation">House price inflation:</label>
+            <input type="number" id="house_price_inflation" name="house_price_inflation" step="0.1" oninput="calculate()">%
+            <br>
             <label for="min_deposit">Minimum deposit required by bank:</label>
             <input type="number" id="min_deposit" name="min_deposit" min="0" oninput="calculate()">%
             <br>
@@ -183,6 +186,7 @@ If not, see <https://www.gnu.org/licenses/>.
     setParameter('monthly_savings', 100);
     setParameter('mortgage_rate', 3.5, 0, 100);
     setParameter('savings_rate', 3.5, 0, 100);
+    setParameter('house_price_inflation', 3)
     setParameter('min_deposit', 10, 0, 100);
     setParameter('rent', 1000);
     setParameter('birth_date', DEFAULT_BIRTH_DATE);
@@ -211,7 +215,7 @@ If not, see <https://www.gnu.org/licenses/>.
                 },
                 title: {
                     display: true,
-                    text: 'Total cost to obtain a mortgage at various points in the future.'
+                    text: 'Total cost to buy the house at various points in the future.'
                 }
             }
         }

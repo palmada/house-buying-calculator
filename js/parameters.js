@@ -24,6 +24,7 @@ function exportAsURL() {
     appendParameter('monthly_savings');
     appendParameter('mortgage_rate');
     appendParameter('savings_rate');
+    appendParameter('house_price_inflation');
     appendParameter('min_deposit');
     appendParameter('rent');
     appendParameter('birth_date');

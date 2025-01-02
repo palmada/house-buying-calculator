@@ -163,10 +163,10 @@ function calculate() {
             "Most banks do not lend into retirement."
     }
 
-    scenario_2.innerHTML = "<b>Lowest cost mortgage</b><br>";
+    scenario_2.innerHTML = "<b>Lowest cost scenario</b><br>";
 
     if (min_cost_simulation.principal_amount <= monthly_savings) {
-        scenario_2.innerHTML += "You'll be able to save quickly enough that it's best to rent until you buy.";
+        scenario_2.innerHTML += "You'll be able to save the most by renting until you buy.";
     }
     else if (can_get_mortgage) {
         if (min_cost_simulation.date <= min_deposit_simulation.date) {

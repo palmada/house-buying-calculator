@@ -45,9 +45,9 @@ function calculate() {
 
     document.getElementById('tax_amount').innerHTML = tax_amount.toFixed(2).toString();
 
-    let interest_rate = parseFloat(document.getElementById("interest_rate").value);
+    let mortgage_interest_rate = parseFloat(document.getElementById("mortgage_rate").value);
     let min_deposit_percentage = parseFloat(document.getElementById("min_deposit").value);
-    let monthly_interest_rate = interest_rate / 1200;
+    let monthly_mortgage_rate = mortgage_interest_rate / 1200;
     let current_savings = parseFloat(document.getElementById("savings").value);
     let monthly_savings =  parseFloat(document.getElementById("monthly_savings").value);
     let rent = parseFloat(document.getElementById("rent").value);
@@ -86,7 +86,7 @@ function calculate() {
             retirement_date,
             house_price,
             tax_amount,
-            monthly_interest_rate,
+            monthly_mortgage_rate,
             current_savings,
             monthly_savings,
             max_mortgage_length
@@ -316,12 +316,12 @@ class MortgageSimulation {
      * @param retirement_date The date for the retirement
      * @param house_price The target house price
      * @param tax_amount The amount of tax and fees needed to pay for the target house price
-     * @param monthly_interest_rate The monthly interest rate (annual interest rate / 12, as rate, not percentage)
+     * @param monthly_mortgage_rate The monthly interest rate on the mortgage (monthly rate = annual % / 1200)
      * @param starting_savings The current savings as of today
      * @param monthly_savings The monthly amount you can save
      * @param max_duration Maximum length the bank will give a mortgage for
      */
-    constructor(months, retirement_date, house_price, tax_amount, monthly_interest_rate,
+    constructor(months, retirement_date, house_price, tax_amount, monthly_mortgage_rate,
                 starting_savings, monthly_savings, max_duration) {
         this.date = DateTime.now().plus({months: months});
 
@@ -345,12 +345,12 @@ class MortgageSimulation {
 
             this.deposit_percentage = (this.deposit / house_price) * 100;
 
-            this.monthly_payment = payment(monthly_interest_rate,
+            this.monthly_payment = payment(monthly_mortgage_rate,
                 this.duration,
                 this.principal_amount
             );
 
-            this.total_interest = total_mortgage_interest(monthly_interest_rate,
+            this.total_interest = total_mortgage_interest(monthly_mortgage_rate,
                 this.duration,
                 this.principal_amount,
                 this.monthly_payment

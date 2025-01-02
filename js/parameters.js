@@ -22,7 +22,7 @@ function exportAsURL() {
     appendParameter('house_price');
     appendParameter('savings');
     appendParameter('monthly_savings');
-    appendParameter('interest_rate');
+    appendParameter('mortgage_rate');
     appendParameter('min_deposit');
     appendParameter('rent');
     appendParameter('birth_date');

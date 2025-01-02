@@ -46,8 +46,10 @@ function calculate() {
     document.getElementById('tax_amount').innerHTML = tax_amount.toFixed(2).toString();
 
     let mortgage_interest_rate = parseFloat(document.getElementById("mortgage_rate").value);
-    let min_deposit_percentage = parseFloat(document.getElementById("min_deposit").value);
+    let savings_interest_rate = parseFloat(document.getElementById("savings_rate").value);
     let monthly_mortgage_rate = mortgage_interest_rate / 1200;
+    let monthly_savings_rate = savings_interest_rate / 1200;
+    let min_deposit_percentage = parseFloat(document.getElementById("min_deposit").value);
     let current_savings = parseFloat(document.getElementById("savings").value);
     let monthly_savings =  parseFloat(document.getElementById("monthly_savings").value);
     let rent = parseFloat(document.getElementById("rent").value);
@@ -87,6 +89,7 @@ function calculate() {
             house_price,
             tax_amount,
             monthly_mortgage_rate,
+            monthly_savings_rate,
             current_savings,
             monthly_savings,
             max_mortgage_length
@@ -296,6 +299,23 @@ function total_mortgage_interest(interest_rate, n_months, loan_value, monthly_pa
 }
 
 /**
+ * Calculates the savings growth for a given starting value that also has monthly contributions (i.e calculates the
+ * total earned through a compound interest savings account).
+ * This is based on the geometric derivation in the Wikipedia article on compound interest.
+ *
+ * @param starting_value The initial value in the savings/investment account.
+ * @param interest The monthly interest.
+ * @param n_months The number of mounts we'll calculate for.
+ * @param monthly_contribution The monthly contribution to the account.
+ * @returns {number}
+ */
+function compound_interest(starting_value, interest, n_months, monthly_contribution = 0) {
+    let T1 = ((1 + interest) ** n_months) - 1;
+    let T2 = starting_value * ((1 + interest) ** n_months);
+    return monthly_contribution * (T1 / interest) + T2;
+}
+
+/**
  * Represents the calculation result for a given month in the time series.
  */
 class MortgageSimulation {
@@ -317,15 +337,17 @@ class MortgageSimulation {
      * @param house_price The target house price
      * @param tax_amount The amount of tax and fees needed to pay for the target house price
      * @param monthly_mortgage_rate The monthly interest rate on the mortgage (monthly rate = annual % / 1200)
+     * @param monthly_savings_rate The monthly interest rate on your savings and investments (monthly rate = annual % / 1200)
      * @param starting_savings The current savings as of today
      * @param monthly_savings The monthly amount you can save
      * @param max_duration Maximum length the bank will give a mortgage for
      */
-    constructor(months, retirement_date, house_price, tax_amount, monthly_mortgage_rate,
+    constructor(months, retirement_date, house_price, tax_amount,
+                monthly_mortgage_rate, monthly_savings_rate,
                 starting_savings, monthly_savings, max_duration) {
         this.date = DateTime.now().plus({months: months});
 
-        this.savings = starting_savings + (months * monthly_savings)
+        this.savings = compound_interest(starting_savings, monthly_savings_rate, months, monthly_savings);
 
         this.deposit = this.savings - tax_amount;
 

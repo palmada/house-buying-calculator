@@ -23,6 +23,7 @@ function exportAsURL() {
     appendParameter('savings');
     appendParameter('monthly_savings');
     appendParameter('mortgage_rate');
+    appendParameter('savings_rate');
     appendParameter('min_deposit');
     appendParameter('rent');
     appendParameter('birth_date');

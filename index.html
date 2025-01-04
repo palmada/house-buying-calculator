@@ -188,10 +188,10 @@ If not, see <https://www.gnu.org/licenses/>.
      * It then validates the final value and adds 'oninput' function to validate values, update the cookie,
      * and finally trigger the simulation.
      *
-     * @param id The input element ID we're setting up
-     * @param default_value The default value starting for the parameter
-     * @param min For number inputs, the minimum value it should be set to.
-     * @param max For number inputs, the maximum value it should be set to.
+     * @param {string} id The input element ID we're setting up
+     * @param {any} default_value The default value starting for the parameter
+     * @param {number} min For number inputs, the minimum value it should be set to.
+     * @param {number} max For number inputs, the maximum value it should be set to.
      */
     let setParameter = (id, default_value = 0, min = 0, max = Number.MAX_SAFE_INTEGER) => {
         let value = default_value;

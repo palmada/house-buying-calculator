@@ -70,11 +70,10 @@ If not, see <https://www.gnu.org/licenses/>.
     <table>
     <tr>
         <th>Inputs</th>
-        <th>Calculated values</th>
-        <th>Chart</th>
+        <th colspan="2">Chart</th>
     </tr>
     <tr>
-        <td>
+        <td class="inputs">
             <label for="currency">Currency (decorative only):</label>
             <select id="currency" name="currency" oninput="updateCurrency()"></select>
             <br>
@@ -118,6 +117,8 @@ If not, see <https://www.gnu.org/licenses/>.
             <label for="retirement_age">Retirement age:</label>
             <input type="number" id="retirement_age" name="retirement_age" min="16" oninput="calculate()">
             <br>
+            <label for="date_retirement">Retirement date: </label><span id="date_retirement" class="date_retirement"></span>
+            <br>
             <label for="max_mortgage_length">Max. mortgage length:</label>
             <input type="number" id="max_mortgage_length" min="1" name="max_mortgage_length" oninput="calculate()">
             years.
@@ -133,15 +134,8 @@ If not, see <https://www.gnu.org/licenses/>.
             <input type="number" id="custom_tax_amount" name="custom_tax_amount" min="0" step="1000" oninput="calculate()">
             <br>
         </td>
-        <td class="calculated_values">
-            <label for="date_retirement">Retirement date: </label><span id="date_retirement"></span>
-            <br>
-            <label for="months_retirement">Months until retirement: </label><span id="months_retirement"></span>
-            <br>
-            <label for="tax_amount">Tax for purchase: </label><span id="tax_amount"></span><span class="currency-symbol">€</span>
-        </td>
-        <td>
-            <canvas id="totalCostChart" style="width: 100%; height: 100%;"></canvas>
+        <td colspan="2" class="chart">
+            <canvas id="totalCostChart" class="chart"></canvas>
         </td>
     </tr>
     <tr>

@@ -24,10 +24,6 @@ function calculate() {
 
     document.getElementById("date_retirement").innerHTML = retirement_date.toLocaleString(DATE_MED);
 
-    let months_until_retirement = Math.round(retirement_date.diff(DateTime.now(), 'months').months);
-
-    document.getElementById('months_retirement').innerHTML = months_until_retirement.toString();
-
     let house_price = parseFloat(document.getElementById("house_price").value);
     let new_build = document.getElementById("new_build").checked;
     let tax_region = document.getElementById("taxes").value;
@@ -45,8 +41,6 @@ function calculate() {
             tax_amount = 0;
         }
     }
-
-    document.getElementById('tax_amount').innerHTML = tax_amount.toFixed(2).toString();
 
     let mortgage_interest_rate = parseFloat(document.getElementById("mortgage_rate").value);
     let savings_interest_rate = parseFloat(document.getElementById("savings_rate").value);

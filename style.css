@@ -28,6 +28,15 @@ td, th {
     padding: 5px;
 }
 
+.inputs {
+    width: 30%;
+}
+
+.chart {
+    column-span: 2;
+    width: 60%;
+}
+
 .scenario {
     border: 1px solid black;
     vertical-align: top;
@@ -38,10 +47,6 @@ body {
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
-}
-
-.calculated_values {
-    width: 20%;
 }
 
 .copyright_footer {

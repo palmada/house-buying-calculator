@@ -58,6 +58,8 @@ function calculate() {
     let current_savings = parseFloat(document.getElementById("savings").value);
     let monthly_savings =  parseFloat(document.getElementById("monthly_savings").value);
     let rent = parseFloat(document.getElementById("rent").value);
+    let rent_inflation_factor = parseFloat(document.getElementById("rent_inflation").value);
+    rent_inflation_factor = 1 + (rent_inflation_factor / 100);
     let max_mortgage_length = parseFloat(document.getElementById("max_mortgage_length").value);
     max_mortgage_length *= 12; // Convert to months
 
@@ -138,6 +140,11 @@ function calculate() {
         }
 
         month_index++
+
+        // Rent only increases early, to better mimic how it happens in real life as rental agreements get negotiated
+        if (month_index % 12 === 0) {
+            rent = Math.round(rent * rent_inflation_factor);
+        }
     }
 
     let currency = document.getElementById("currency").value;

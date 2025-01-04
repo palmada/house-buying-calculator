@@ -47,6 +47,7 @@ If not, see <https://www.gnu.org/licenses/>.
         appendParameter('mortgage_rate');
         appendParameter('savings_rate');
         appendParameter('house_price_inflation');
+        appendParameter('rent_inflation');
         appendParameter('min_deposit');
         appendParameter('rent');
         appendParameter('birth_date');
@@ -98,6 +99,9 @@ If not, see <https://www.gnu.org/licenses/>.
             <br>
             <label for="house_price_inflation">House price inflation:</label>
             <input type="number" id="house_price_inflation" name="house_price_inflation" step="0.1" oninput="calculate()">%
+            <br>
+            <label for="rent_inflation">Rent inflation:</label>
+            <input type="number" id="rent_inflation" name="rent_inflation" step="0.1" oninput="calculate()">%
             <br>
             <label for="min_deposit">Minimum deposit required by bank:</label>
             <input type="number" id="min_deposit" name="min_deposit" min="0" oninput="calculate()">%
@@ -244,7 +248,8 @@ If not, see <https://www.gnu.org/licenses/>.
     setParameter('monthly_savings', 100);
     setParameter('mortgage_rate', 3.5, 0, 100);
     setParameter('savings_rate', 3.5, 0, 100);
-    setParameter('house_price_inflation', 3)
+    setParameter('house_price_inflation', 3);
+    setParameter('rent_inflation', 2.5);
     setParameter('min_deposit', 10, 0, 100);
     setParameter('rent', 1000);
     setParameter('birth_date', DEFAULT_BIRTH_DATE);

@@ -239,7 +239,7 @@ function calculate() {
             "Your savings per month are not enough to pay outright " +
             " before you are " + Math.round(max_simulation_length) +" years old.<br>You will have spent " +
             NUMBER_FORMAT.format(Math.round(loss_to_rent)) + currency +
-            " on rent, and by then the house will be valued at" +
+            " on rent, and by then the house will be valued at " +
             NUMBER_FORMAT.format(Math.round(house_price)) + currency + ".";
     }
 

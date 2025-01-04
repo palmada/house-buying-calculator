@@ -54,6 +54,7 @@ If not, see <https://www.gnu.org/licenses/>.
         appendParameter('birth_date');
         appendParameter('retirement_age');
         appendParameter('max_mortgage_length');
+        appendParameter('max_simulation_length');
         appendParameter('taxes');
         appendParameter('custom_tax_amount');
 
@@ -119,6 +120,11 @@ If not, see <https://www.gnu.org/licenses/>.
             <br>
             <label for="max_mortgage_length">Max. mortgage length:</label>
             <input type="number" id="max_mortgage_length" min="1" name="max_mortgage_length" oninput="calculate()">
+            years.
+            <br>
+            <label for="max_simulation_length">Max. simulated age:</label>
+            <input type="number" id="max_simulation_length" min="1" name="max_simulation_length" oninput="calculate()">
+            years old.
             <br>
             <label for="taxes">Tax region:</label>
             <select id="taxes" name="taxes" oninput="calculate()"></select>
@@ -263,6 +269,7 @@ If not, see <https://www.gnu.org/licenses/>.
     setParameter('birth_date', DEFAULT_BIRTH_DATE);
     setParameter('retirement_age', 67, 18, 120);
     setParameter('max_mortgage_length', 35, 1);
+    setParameter('max_simulation_length', 120, 1, 1000);
     setParameter('taxes', 'custom');
     setParameter('custom_tax_amount', 0, 0);
 

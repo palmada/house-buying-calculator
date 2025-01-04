@@ -62,6 +62,7 @@ function calculate() {
     rent_inflation_factor = 1 + (rent_inflation_factor / 100);
     let max_mortgage_length = parseFloat(document.getElementById("max_mortgage_length").value);
     max_mortgage_length *= 12; // Convert to months
+    let max_simulation_length = parseFloat(document.getElementById("max_simulation_length").value);
 
     let scenario_1 =  document.getElementById('scenario_1');
     let scenario_2 =  document.getElementById('scenario_2');
@@ -83,8 +84,7 @@ function calculate() {
     let buy_outright_date;
     let buy_outright_price;
 
-    // We doubt anyone will live past 120 years of age and least of all be looking to buy a house
-    let oldest_possible_date = birth_date.plus({years: 120});
+    let oldest_possible_date = birth_date.plus({years: max_simulation_length});
 
     let stop_condition_found = false;
     let month_index = 1;
@@ -240,7 +240,7 @@ function calculate() {
     else {
         scenario_3.innerHTML =  "<b>Buying outright</b><br>" +
             "Your savings per month are not enough to pay outright " +
-            " before you are 120 years old.<br>You will have spent " +
+            " before you are " + Math.round(max_simulation_length) +" years old.<br>You will have spent " +
             NUMBER_FORMAT.format(Math.round(loss_to_rent)) + currency +
             " on rent, and by then the house will be valued at" +
             NUMBER_FORMAT.format(Math.round(house_price)) + currency + ".";

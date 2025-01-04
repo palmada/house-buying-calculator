@@ -40,6 +40,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
         let appendParameter = (id) =>  parameters.append(id, document.getElementById(id).value)
 
+        appendParameter('currency');
         appendParameter('house_price');
         parameters.append('new_build', document.getElementById('new_build').checked); // Checkboxes are set differently
         appendParameter('savings');
@@ -248,6 +249,7 @@ If not, see <https://www.gnu.org/licenses/>.
         });
     }
 
+    setParameter('currency', '€')
     setParameter('house_price', 100_000);
     setCheckbox('new_build');
     setParameter('savings', 1000);

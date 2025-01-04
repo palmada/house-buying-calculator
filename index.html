@@ -41,6 +41,7 @@ If not, see <https://www.gnu.org/licenses/>.
         let appendParameter = (id) =>  parameters.append(id, document.getElementById(id).value)
 
         appendParameter('house_price');
+        parameters.append('new_build', document.getElementById('new_build').checked); // Checkboxes are set differently
         appendParameter('savings');
         appendParameter('monthly_savings');
         appendParameter('mortgage_rate');
@@ -77,6 +78,9 @@ If not, see <https://www.gnu.org/licenses/>.
             <label for="house_price">House price:</label>
             <input type="number" id="house_price" name="house_price" min="1" step="5000" oninput="calculate()">
             <span class="currency-symbol">€</span>
+            <br>
+            <label for="new_build">New build?</label>
+            <input type="checkbox" id="new_build" name="new_build" oninput="calculate()">
             <br>
             <label for="savings">Savings:</label>
             <input type="number" id="savings" name="savings" min="0" step="1000" oninput="calculate()">
@@ -190,10 +194,13 @@ If not, see <https://www.gnu.org/licenses/>.
      *
      * @param {string} id The input element ID we're setting up
      * @param {any} default_value The default value starting for the parameter
-     * @param {number} min For number inputs, the minimum value it should be set to.
-     * @param {number} max For number inputs, the maximum value it should be set to.
+     * @param {number=} min For number inputs, the minimum value it should be set to.
+     * @param {number=} max For number inputs, the maximum value it should be set to.
+     * @param {Function=} set_element_state Function to set the value for the element.
      */
-    let setParameter = (id, default_value = 0, min = 0, max = Number.MAX_SAFE_INTEGER) => {
+    let setParameter = (id, default_value = 0, min = 0, max = Number.MAX_SAFE_INTEGER,
+                        set_element_state = (element, value) => element.value = value
+    ) => {
         let value = default_value;
 
         if (URL_PARAMS.has(id)) {
@@ -212,7 +219,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
         COOKIE_API.set(id, value);
         let element = document.getElementById(id);
-        element.value = value;
+        set_element_state(element, value);
 
         element.oninput = () => {
             validate(id, default_value, min, max);
@@ -221,7 +228,18 @@ If not, see <https://www.gnu.org/licenses/>.
         };
     }
 
+    /**
+     * Sets up checkbox style input parameters
+     * @param {string} id The checkbox element ID
+     */
+    let setCheckbox = (id) => {
+        setParameter(id, false, 0, 1, (checkbox, value) => {
+            checkbox.checked = value === 'true';
+        });
+    }
+
     setParameter('house_price', 100_000);
+    setCheckbox('new_build');
     setParameter('savings', 1000);
     setParameter('monthly_savings', 100);
     setParameter('mortgage_rate', 3.5, 0, 100);

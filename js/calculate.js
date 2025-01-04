@@ -29,13 +29,14 @@ function calculate() {
     document.getElementById('months_retirement').innerHTML = months_until_retirement.toString();
 
     let house_price = parseFloat(document.getElementById("house_price").value);
+    let new_build = document.getElementById("new_build").checked;
     let tax_region = document.getElementById("taxes").value;
     let custom_tax = false;
     let tax_amount;
 
     if (tax_region.startsWith('spain')) {
         tax_region = tax_region.replace("spain-", "");
-        tax_amount = taxes_and_fees_spain(tax_region, house_price, false, true);
+        tax_amount = taxes_and_fees_spain(tax_region, house_price, new_build, true);
     }
     else {
         custom_tax = true;
@@ -133,7 +134,7 @@ function calculate() {
 
         if ( ! custom_tax) {
             // The tax amount will grow with the growth of the house price
-            tax_amount = taxes_and_fees_spain(tax_region, house_price, false, true);
+            tax_amount = taxes_and_fees_spain(tax_region, house_price, new_build, true);
         }
 
         month_index++
@@ -215,7 +216,7 @@ function calculate() {
         let rent_paid = Math.round(buy_outright_date.diff(DateTime.now(), 'months').months) * rent;
 
         if ( ! custom_tax) {
-            tax_amount = Math.round(taxes_and_fees_spain(tax_region, buy_outright_price, false, false));
+            tax_amount = Math.round(taxes_and_fees_spain(tax_region, buy_outright_price, new_build, false));
         }
 
         scenario_3.innerHTML = "<b>Buying outright</b><br>" +

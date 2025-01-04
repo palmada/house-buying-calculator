@@ -188,10 +188,7 @@ function calculate() {
 
     scenario_2.innerHTML = "<b>Lowest cost scenario</b><br>";
 
-    if (min_cost_simulation.principal_amount <= monthly_savings) {
-        scenario_2.innerHTML += "You'll be able to save the most by renting until you buy.";
-    }
-    else if (can_get_mortgage) {
+    if (can_get_mortgage) {
         if (min_cost_simulation.date <= min_deposit_simulation.date) {
             scenario_2.innerHTML +=
                 "You will save the most by buying a house as soon as you can afford it.<br>" +

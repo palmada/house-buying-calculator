@@ -265,7 +265,8 @@ function calculate() {
  * @returns {number}
  */
 function payment(interest_rate, n_months, loan_value) {
-    if (interest_rate <= 0) {
+    if (Math.abs(interest_rate) <= 0.000001) {
+        // Avoids division by 0 and subnormal values
         return loan_value/n_months;
     }
 
@@ -283,7 +284,9 @@ function payment(interest_rate, n_months, loan_value) {
  * @returns {number}
  */
 function total_mortgage_interest(interest_rate, n_months, loan_value, monthly_payment) {
-    if (interest_rate <= 0) {
+    if (Math.abs(interest_rate) <= 0.000001) {
+        // The compound interest formula would cause a division by 0 otherwise
+        // Subnormal values would also give incorrect results (decreasing savings).
         return 0;
     }
 
@@ -309,6 +312,12 @@ function total_mortgage_interest(interest_rate, n_months, loan_value, monthly_pa
  * @returns {number}
  */
 function compound_interest(starting_value, interest, n_months, monthly_contribution = 0) {
+    if (Math.abs(interest) <= 0.000001) {
+        // The compound interest formula would cause a division by 0 otherwise
+        // Subnormal values would also give incorrect results (decreasing savings).
+        return starting_value + (n_months * monthly_contribution)
+    }
+
     let T1 = ((1 + interest) ** n_months) - 1;
     let T2 = starting_value * ((1 + interest) ** n_months);
     return monthly_contribution * (T1 / interest) + T2;

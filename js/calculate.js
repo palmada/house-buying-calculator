@@ -290,7 +290,7 @@ function total_mortgage_interest(interest_rate, n_months, loan_value, monthly_pa
 }
 
 /**
- * Calculates the savings growth for a given starting value that also has monthly contributions (i.e calculates the
+ * Calculates the savings growth for a given starting value that also has monthly contributions (i.e. calculates the
  * total earned through a compound interest savings account).
  * This is based on the geometric derivation in the Wikipedia article on compound interest.
  *

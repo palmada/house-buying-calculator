@@ -25,10 +25,38 @@ If not, see <https://www.gnu.org/licenses/>.
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 
 <script src="js/update_currency.js"></script>
-<script src="js/parameters.js"></script>
 <script src="js/taxes.js"></script>
 <script src="js/calculate.js"></script>
 <script src="js/validate.js"></script>
+
+<script>
+    /**
+     * Exports the input values provided by the user as URL parameters.
+     *
+     * @returns A URL string with the input values stored as URL parameters.
+     */
+    function exportAsURL() {
+        let parameters = new URLSearchParams()
+
+        let appendParameter = (id) =>  parameters.append(id, document.getElementById(id).value)
+
+        appendParameter('house_price');
+        appendParameter('savings');
+        appendParameter('monthly_savings');
+        appendParameter('mortgage_rate');
+        appendParameter('savings_rate');
+        appendParameter('house_price_inflation');
+        appendParameter('min_deposit');
+        appendParameter('rent');
+        appendParameter('birth_date');
+        appendParameter('retirement_age');
+        appendParameter('max_mortgage_length');
+        appendParameter('taxes');
+        appendParameter('custom_tax_amount');
+
+        return window.location.href.split("?")[0] + "?" + parameters.toString()
+    }
+</script>
 
 <body>
 

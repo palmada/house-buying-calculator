@@ -248,42 +248,6 @@ function calculate() {
     chart.update();
 }
 
-const TABLE_HEADER = '<tr>' +
-    '<th>Date</th>' +
-    '<th>Savings</th>' +
-    '<th>Deposit</th>' +
-    '<th>Mortgage</th>' +
-    '<th>Deposit %</th>' +
-    '<th>Monthly payment</th>' +
-    '<th>Mortgage length</th>' +
-    '<th>Total interest</th>' +
-    '<th>Total cost</th>' +
-    '</tr>'
-
-function buildTable(simulations, total_costs, currency) {
-    let simulationsTable = document.getElementById('simulationsTable');
-    simulationsTable.innerHTML = '';
-    simulationsTable.innerHTML += TABLE_HEADER;
-
-    for (let s = 0; s < simulations.length; s++) {
-        let simulation = simulations[s];
-        let total_cost = total_costs[s];
-
-        let row = "<tr>";
-        row += "<td>" + simulation.date.toLocaleString(DATE_MED); + "</td>";
-        row += "<td>" + NUMBER_FORMAT.format(simulation.savings) + currency + "</td>";
-        row += "<td>" + NUMBER_FORMAT.format(simulation.deposit)  + currency + "</td>";
-        row += "<td>" + NUMBER_FORMAT.format(simulation.mortgage_principal_amount)  + currency + "</td>";
-        row += "<td>" + simulation.deposit_percentage.toFixed(2)   + "%</td>";
-        row += "<td>" + NUMBER_FORMAT.format(simulation.mortgage_payment.toFixed(2))  + currency + "</td>";
-        row += "<td>" + NUMBER_FORMAT.format((simulation.mortgage_duration / 12).toFixed(1)) + " years</td>";
-        row += "<td>" + NUMBER_FORMAT.format(simulation.total_interest_on_mortgage.toFixed(0))  + currency + "</td>";
-        row += "<td>" + NUMBER_FORMAT.format(total_cost) + currency + "</td>";
-        row += "</tr>";
-        simulationsTable.innerHTML += row;
-    }
-}
-
 /**
  * Calculates the monthly payment amount on a mortgage. Assumes payments are monthly and paid at the end of the month.
  *

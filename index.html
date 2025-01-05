@@ -69,20 +69,39 @@ If not, see <https://www.gnu.org/licenses/>.
 <form>
     <table>
     <tr>
-        <th>Inputs</th>
-        <th colspan="2">Chart</th>
-    </tr>
-    <tr>
         <td class="inputs">
-            <label for="currency">Currency (decorative only):</label>
-            <select id="currency" name="currency" oninput="updateCurrency()"></select>
-            <br>
+            <h3>About the house</h3>
+
             <label for="house_price">House price:</label>
             <input type="number" id="house_price" name="house_price" min="1" step="5000" oninput="calculate()">
             <span class="currency-symbol">€</span>
             <br>
             <label for="new_build">New build?</label>
             <input type="checkbox" id="new_build" name="new_build" oninput="calculate()">
+            <br>
+            <label for="rent">Current rent:</label>
+            <input type="number" id="rent" name="rent" min="0" step="100" oninput="calculate()">
+            <span class="currency-symbol">€</span>
+            <br>
+            <label for="taxes">Tax region:</label>
+            <select id="taxes" name="taxes" oninput="calculate()"></select>
+            <br>
+            <label for="custom_tax_amount">Custom tax amount: </label>
+            <input type="number" id="custom_tax_amount" name="custom_tax_amount" min="0" step="1000" oninput="calculate()">
+            <br>
+            <label for="currency">Currency (decorative only):</label>
+            <select id="currency" name="currency" onchange="updateCurrency()"></select>
+            <br>
+
+            <h3>About you</h3>
+
+            <label for="birth_date">Birthdate:</label>
+            <input type="date" id="birth_date" name="birth_date">
+            <br>
+            <label for="retirement_age">Retirement age:</label>
+            <input type="number" id="retirement_age" name="retirement_age" min="16" oninput="calculate()">
+            <br>
+            <label for="date_retirement">Retirement date: </label><span id="date_retirement" class="date_retirement"></span>
             <br>
             <label for="savings">Savings:</label>
             <input type="number" id="savings" name="savings" min="0" step="1000" oninput="calculate()">
@@ -92,9 +111,26 @@ If not, see <https://www.gnu.org/licenses/>.
             <input type="number" id="monthly_savings" name="monthly_savings" min="0" step="100" oninput="calculate()">
             <span class="currency-symbol">€</span>
             <br>
+            <label for="max_simulation_length">Max. simulated age:</label>
+            <input type="number" id="max_simulation_length" min="1" name="max_simulation_length" oninput="calculate()">
+            years old.
+            <br>
+
+            <h3>Mortgage details</h3>
+
             <label for="mortgage_rate">Mortgage interest rate:</label>
             <input type="number" id="mortgage_rate" name="mortgage_rate" min="0" step="0.1" oninput="calculate()">%
             <br>
+            <label for="min_deposit">Minimum deposit required by bank:</label>
+            <input type="number" id="min_deposit" name="min_deposit" min="0" oninput="calculate()">%
+            <br>
+            <label for="max_mortgage_length">Max. mortgage length:</label>
+            <input type="number" id="max_mortgage_length" min="1" name="max_mortgage_length" oninput="calculate()">
+            years.
+            <br>
+
+            <h3>Futurology</h3>
+
             <label for="savings_rate">Savings Interest rate:</label>
             <input type="number" id="savings_rate" name="savings_rate" min="0" step="0.1" oninput="calculate()">%
             <br>
@@ -103,35 +139,6 @@ If not, see <https://www.gnu.org/licenses/>.
             <br>
             <label for="rent_inflation">Rent inflation:</label>
             <input type="number" id="rent_inflation" name="rent_inflation" step="0.1" oninput="calculate()">%
-            <br>
-            <label for="min_deposit">Minimum deposit required by bank:</label>
-            <input type="number" id="min_deposit" name="min_deposit" min="0" oninput="calculate()">%
-            <br>
-            <label for="rent">Current rent:</label>
-            <input type="number" id="rent" name="rent" min="0" step="100" oninput="calculate()">
-            <span class="currency-symbol">€</span>
-            <br>
-            <label for="birth_date">Birthdate:</label>
-            <input type="date" id="birth_date" name="birth_date">
-            <br>
-            <label for="retirement_age">Retirement age:</label>
-            <input type="number" id="retirement_age" name="retirement_age" min="16" oninput="calculate()">
-            <br>
-            <label for="date_retirement">Retirement date: </label><span id="date_retirement" class="date_retirement"></span>
-            <br>
-            <label for="max_mortgage_length">Max. mortgage length:</label>
-            <input type="number" id="max_mortgage_length" min="1" name="max_mortgage_length" oninput="calculate()">
-            years.
-            <br>
-            <label for="max_simulation_length">Max. simulated age:</label>
-            <input type="number" id="max_simulation_length" min="1" name="max_simulation_length" oninput="calculate()">
-            years old.
-            <br>
-            <label for="taxes">Tax region:</label>
-            <select id="taxes" name="taxes" oninput="calculate()"></select>
-            <br>
-            <label for="custom_tax_amount">Custom tax amount: </label>
-            <input type="number" id="custom_tax_amount" name="custom_tax_amount" min="0" step="1000" oninput="calculate()">
             <br>
         </td>
         <td colspan="2" class="chart">

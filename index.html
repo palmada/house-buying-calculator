@@ -61,6 +61,53 @@ If not, see <https://www.gnu.org/licenses/>.
 
         return window.location.href.split("?")[0] + "?" + parameters.toString()
     }
+
+    /**
+     * Show/hide the elements that change with the tax region.
+     */
+    function updateElements() {
+        let tax_region = document.getElementById('tax_region').value;
+        let custom_tax_amount = document.getElementById('custom_tax_amount');
+        let custom_tax_amount_label = document.getElementById('custom_tax_amount_label');
+        let currency = document.getElementById('currency');
+        let currency_label = document.getElementById('currency_label');
+        let new_build = document.getElementById('new_build');
+        let new_build_label = document.getElementById('new_build_label');
+        let first_home = document.getElementById('first_home');
+        let first_home_label = document.getElementById('first_home_label');
+
+        custom_tax_amount.style.display = 'none';
+        custom_tax_amount_label.style.display = 'none';
+        currency.style.display = 'none';
+        currency_label.style.display = 'none';
+        new_build.style.display = 'none';
+        new_build_label.style.display = 'none';
+        first_home.style.display = 'none';
+        first_home_label.style.display = 'none';
+
+        if (tax_region.startsWith('custom')) {
+            custom_tax_amount.style.display = 'inline-block';
+            custom_tax_amount_label.style.display = 'inline-block';
+            currency.style.display = 'inline-block';
+            currency_label.style.display = 'inline-block';
+        }
+        else {
+            if (tax_region.startsWith('uk')) {
+                currency.value = '£';
+                first_home.style.display = 'inline-block';
+                first_home_label.style.display = 'inline-block';
+            }
+            else {
+                currency.value = '€';
+            }
+            updateCurrency();
+
+            if (tax_region.startsWith('spain')) {
+                new_build.style.display = 'inline-block';
+                new_build_label.style.display = 'inline-block';
+            }
+        }
+    }
 </script>
 
 <body>
@@ -83,23 +130,23 @@ If not, see <https://www.gnu.org/licenses/>.
                 <input type="number" id="house_price" name="house_price" min="1" step="5000" oninput="calculate()" />
                 <span class="currency-symbol">€</span>
             </label>
-            <label for="new_build">
+            <label for="tax_region">
+                <span class="label-span">Tax region:</span>
+                <select id="tax_region" name="tax_region" class="tax_selector"></select>
+            </label>
+            <label for="new_build" id="new_build_label">
                 <span class="label-span">New build?</span>
                 <input type="checkbox" id="new_build" name="new_build" oninput="calculate()">
             </label>
-            <label for="first_home">
+            <label for="first_home" id="first_home_label">
                 <span class="label-span">First home?</span>
                 <input type="checkbox" id="first_home" name="first_home" oninput="calculate()">
             </label>
-            <label for="tax_region">
-                <span class="label-span">Tax region:</span>
-                <select id="tax_region" name="tax_region" class="tax_selector" oninput="calculate()"></select>
-            </label>
-            <label for="custom_tax_amount">
+            <label for="custom_tax_amount" id="custom_tax_amount_label">
                 <span class="label-span">Custom tax amount:</span>
                 <input type="number" id="custom_tax_amount" name="custom_tax_amount" min="0" step="1000" oninput="calculate()">
             </label>
-            <label for="currency">
+            <label for="currency" id="currency_label">
                 <span class="label-span">Currency:</span>
                 <select id="currency" name="currency" onchange="updateCurrency()"></select>
             </label>
@@ -242,6 +289,11 @@ If not, see <https://www.gnu.org/licenses/>.
 
     add_selector_option(tax_selector, 'custom', "Custom tax amount");
 
+    tax_selector.onchange = () => {
+        updateElements();
+        calculate();
+    }
+
     /**
      * Sets up input parameters.
      *
@@ -342,6 +394,7 @@ If not, see <https://www.gnu.org/licenses/>.
         }
     });
 
+    updateElements();
     calculate();
 
 </script>

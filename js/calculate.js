@@ -15,6 +15,37 @@ const DateTime = luxon.DateTime;
 const DATE_MED = luxon.DateTime.DATE_MED;
 
 /**
+ * Calculates the total tax required to pay to buy the house.
+ *
+ * Note: because of portuguese tax law, we have a circular dependency:
+ * - Our main algorithm calculates how much we can put in for a deposit by subtracting the taxes from our savings
+ * - To calculate our taxes, we need to pass the amount we want to get loaned from the bank
+ * - To get the loan amount we need to know how much we can put in for a deposit...
+ *
+ *
+ * @param {string} tax_region The country or region where the house will be bought, as provided by main page selector.
+ * @param {number} house_price The price of the house
+ * @param {number} mortgage_principal How much we will borrow from the bank; 0 or less if not being used.
+ *                                    A rough estimate is fine as this will be a relatively low impact on the total tax.
+ * @param {boolean} new_build Whether this is a new house
+ * @returns {number}
+ */
+function get_tax_amount(tax_region, house_price, mortgage_principal, new_build) {
+    let tax_amount = 0;
+    let mortgage = mortgage_principal > 0;
+    if (tax_region.startsWith('portugal')) {
+        // This is inaccurate...
+        tax_amount = taxes_and_fees_portugal(house_price, mortgage_principal);
+    }
+    else if (tax_region.startsWith('spain')) {
+        tax_region = tax_region.replace("spain-", "");
+        tax_amount = taxes_and_fees_spain(tax_region, house_price, new_build, mortgage);
+    }
+
+    return tax_amount;
+}
+
+/**
  * This is the main calculation function that updates the outputs based on the inputs.
  */
 function calculate() {
@@ -27,19 +58,26 @@ function calculate() {
     let house_price = parseFloat(document.getElementById("house_price").value);
     let new_build = document.getElementById("new_build").checked;
     let tax_region = document.getElementById("taxes").value;
+    let current_savings = parseFloat(document.getElementById("savings").value);
     let custom_tax = false;
     let tax_amount;
 
-    if (tax_region.startsWith('spain')) {
-        tax_region = tax_region.replace("spain-", "");
-        tax_amount = taxes_and_fees_spain(tax_region, house_price, new_build, true);
-    }
-    else {
+    if (tax_region.startsWith('custom')) {
         custom_tax = true;
         tax_amount = parseFloat(document.getElementById("custom_tax_amount").value);
         if (tax_amount < 0 || isNaN(tax_amount) ) {
             tax_amount = 0;
         }
+    }
+    else {
+        // get_tax_amount has a circular dependency as it needs to know the mortgage principal for the Portuguese tax
+        // calculation.
+        // We therefore fudge an initial calculation to have a more accurate starting point.
+        // First we get a rough idea of a deposit assuming a 0% down-payment mortgage
+        let deposit = current_savings - get_tax_amount(tax_region, house_price, house_price, new_build);
+        // We now have a rough tax estimate we can use to calculate a non-0% down-payment.
+        let mortgage_principal = house_price - deposit;
+        tax_amount = get_tax_amount(tax_region, house_price, mortgage_principal, new_build);
     }
 
     let mortgage_interest_rate = parseFloat(document.getElementById("mortgage_rate").value);
@@ -49,7 +87,6 @@ function calculate() {
     let monthly_savings_rate = savings_interest_rate / 1200;
     let house_price_growth_factor = 1 + (house_price_inflation / 1200); // Simple monthly multiplier
     let min_deposit_percentage = parseFloat(document.getElementById("min_deposit").value);
-    let current_savings = parseFloat(document.getElementById("savings").value);
     let monthly_savings =  parseFloat(document.getElementById("monthly_savings").value);
     let rent = parseFloat(document.getElementById("rent").value);
     let rent_inflation_factor = parseFloat(document.getElementById("rent_inflation").value);
@@ -130,7 +167,9 @@ function calculate() {
 
         if ( ! custom_tax) {
             // The tax amount will grow with the growth of the house price
-            tax_amount = taxes_and_fees_spain(tax_region, house_price, new_build, true);
+            // Note we use the principal amount for the previous month, this is because get_tax_amount has a circular
+            // dependency...
+            tax_amount = get_tax_amount(tax_region, house_price, simulation.principal_amount, new_build);
         }
 
         month_index++
@@ -214,7 +253,7 @@ function calculate() {
         let rent_paid = Math.round(buy_outright_date.diff(DateTime.now(), 'months').months) * rent;
 
         if ( ! custom_tax) {
-            tax_amount = Math.round(taxes_and_fees_spain(tax_region, buy_outright_price, new_build, false));
+            tax_amount = Math.round(get_tax_amount(tax_region, buy_outright_price, 0, new_build));
         }
 
         scenario_3.innerHTML = "<b>Buying outright</b><br>" +

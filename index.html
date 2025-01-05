@@ -220,6 +220,8 @@ If not, see <https://www.gnu.org/licenses/>.
 
     let tax_selector = document.getElementById("taxes");
 
+    add_selector_option(tax_selector, 'portugal', 'Portugal - Continental');
+
     for (let region of SPANISH_REGIONS) {
         add_selector_option(tax_selector, 'spain-' + region, 'Spain - ' + region);
     }

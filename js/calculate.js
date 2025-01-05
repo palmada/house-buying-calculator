@@ -94,6 +94,8 @@ function calculate() {
     let house_price_growth_factor = 1 + (house_price_inflation / 1200); // Simple monthly multiplier
     let min_deposit_percentage = parseFloat(document.getElementById("min_deposit").value);
     let monthly_savings =  parseFloat(document.getElementById("monthly_savings").value);
+    let monthly_contribution_growth_factor = parseFloat(document.getElementById("monthly_contribution_growth").value);
+    monthly_contribution_growth_factor = 1 + (monthly_contribution_growth_factor / 100);
     let rent = parseFloat(document.getElementById("rent").value);
     let rent_inflation_factor = parseFloat(document.getElementById("rent_inflation").value);
     rent_inflation_factor = 1 + (rent_inflation_factor / 100);
@@ -125,6 +127,7 @@ function calculate() {
 
     let stop_condition_found = false;
     let month_index = 1;
+    let total_monthly_savings = monthly_savings;
 
     while ( ! stop_condition_found) {
         let simulation = new MortgageSimulation(
@@ -135,7 +138,8 @@ function calculate() {
             monthly_mortgage_rate,
             monthly_savings_rate,
             current_savings,
-            monthly_savings,
+            //The compound interest formula uses a single average value across all contributions
+            total_monthly_savings / month_index,
             max_mortgage_length
         )
 
@@ -178,12 +182,16 @@ function calculate() {
             tax_amount = get_tax_amount(tax_region, house_price, simulation.principal_amount, new_build, first_home);
         }
 
-        month_index++
+        month_index++;
 
-        // Rent only increases early, to better mimic how it happens in real life as rental agreements get negotiated
+        // Rent and salary only increases yearly
         if (month_index % 12 === 0) {
             rent = Math.round(rent * rent_inflation_factor);
+            // We assume that as salaries improve, users can potentially increase their monthly contributions
+            monthly_savings = Math.round(monthly_savings * monthly_contribution_growth_factor);
         }
+
+        total_monthly_savings += monthly_savings;
     }
 
     let currency = document.getElementById("currency").value;

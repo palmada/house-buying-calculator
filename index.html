@@ -47,6 +47,7 @@ If not, see <https://www.gnu.org/licenses/>.
         appendParameter('savings');
         appendParameter('monthly_savings');
         appendParameter('mortgage_rate');
+        appendParameter('monthly_contribution_growth')
         appendParameter('savings_rate');
         appendParameter('house_price_inflation');
         appendParameter('rent_inflation');
@@ -205,7 +206,15 @@ If not, see <https://www.gnu.org/licenses/>.
             </label>
 
             <h3>Futurology</h3>
-
+            <span>All rates are yearly.</span>
+            <br>
+            <label for="monthly_contribution_growth">
+                <span class="label-span">Savings contribution Growth:</span>
+                <input type="number" id="monthly_contribution_growth" name="monthly_contribution_growth" step="0.1" oninput="calculate()">
+                %
+            </label>
+            <br>
+            <span>The above is to allow increasing monthly contributions as careers progress.</span>
             <label for="savings_rate">
                 <span class="label-span">Savings Interest rate:</span>
                 <input type="number" id="savings_rate" name="savings_rate" min="0" step="0.1" oninput="calculate()">
@@ -355,7 +364,8 @@ If not, see <https://www.gnu.org/licenses/>.
     setParameter('savings', 1000);
     setParameter('monthly_savings', 100);
     setParameter('mortgage_rate', 3.5, 0, 100);
-    setParameter('savings_rate', 3.5, 0, 100);
+    setParameter('monthly_contribution_growth', 3.5, 0, 100);
+    setParameter('savings_rate', 4, 10);
     setParameter('house_price_inflation', 3);
     setParameter('rent_inflation', 2.5);
     setParameter('min_deposit', 10, 0, 100);

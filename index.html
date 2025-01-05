@@ -301,6 +301,7 @@ If not, see <https://www.gnu.org/licenses/>.
     document.getElementById('birth_date').setAttribute('max', TODAY.toISODate());
 
     Chart.defaults.font.family = 'Quicksand';
+    Chart.defaults.color = '#000';
     let chart = new Chart('totalCostChart', {
         type: "line",
         data: {

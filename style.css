@@ -12,6 +12,7 @@ If not, see <https://www.gnu.org/licenses/>.
 html, body {
     padding: 5px;
     margin: 5px;
+    background-color: #E6FCEB;
 }
 
 table {
@@ -40,6 +41,12 @@ input {
 
 .tax_selector {
     width: 200px;
+}
+
+select, input {
+    background-color: #d3f1d7;
+    accent-color: #B59CA9;
+    border: 0;
 }
 
 label .label-span

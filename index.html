@@ -56,7 +56,7 @@ If not, see <https://www.gnu.org/licenses/>.
         appendParameter('retirement_age');
         appendParameter('max_mortgage_length');
         appendParameter('max_simulation_length');
-        appendParameter('taxes');
+        appendParameter('tax_region');
         appendParameter('custom_tax_amount');
 
         return window.location.href.split("?")[0] + "?" + parameters.toString()
@@ -91,9 +91,9 @@ If not, see <https://www.gnu.org/licenses/>.
                 <span class="label-span">First home?</span>
                 <input type="checkbox" id="first_home" name="first_home" oninput="calculate()">
             </label>
-            <label for="taxes">
+            <label for="tax_region">
                 <span class="label-span">Tax region:</span>
-                <select id="taxes" name="taxes" class="tax_selector" oninput="calculate()"></select>
+                <select id="tax_region" name="tax_region" class="tax_selector" oninput="calculate()"></select>
             </label>
             <label for="custom_tax_amount">
                 <span class="label-span">Custom tax amount:</span>
@@ -228,7 +228,7 @@ If not, see <https://www.gnu.org/licenses/>.
         add_selector_option(currency_selector, currency, currency);
     }
 
-    let tax_selector = document.getElementById("taxes");
+    let tax_selector = document.getElementById("tax_region");
 
     add_selector_option(tax_selector, 'portugal', 'Portugal - Continental');
 
@@ -312,7 +312,7 @@ If not, see <https://www.gnu.org/licenses/>.
     setParameter('retirement_age', 67, 18, 120);
     setParameter('max_mortgage_length', 35, 1);
     setParameter('max_simulation_length', 120, 1, 1000);
-    setParameter('taxes', 'custom');
+    setParameter('tax_region', 'custom');
     setParameter('custom_tax_amount', 0, 0);
 
     document.getElementById('birth_date').setAttribute('max', TODAY.toISODate());

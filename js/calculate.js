@@ -63,7 +63,7 @@ function calculate() {
     let house_price = parseFloat(document.getElementById("house_price").value);
     let new_build = document.getElementById("new_build").checked;
     let first_home = document.getElementById("first_home").checked;
-    let tax_region = document.getElementById("taxes").value;
+    let tax_region = document.getElementById("tax_region").value;
     let current_savings = parseFloat(document.getElementById("savings").value);
     let custom_tax = false;
     let tax_amount;

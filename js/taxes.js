@@ -79,13 +79,6 @@ SpanishRegionalTax.RegisterRegion('Navarre', 0.005, 0.04);
 SpanishRegionalTax.RegisterRegion('Euskadi', 0.0, 0.04);
 
 /**
- * List of spanish regions that are keys for SPAIN_TAXES.
- *
- * @type {string[]}
- */
-const SPANISH_REGIONS = Array.from(SPAIN_TAXES.keys()).sort();
-
-/**
  * Calculate the total amount due in a progressive tax calculation.
  *
  * @param {number} taxable_amount
@@ -146,6 +139,20 @@ class TaxBracket {
 }
 
 /**
+ * List of spanish regions that are keys for SPAIN_TAXES.
+ *
+ * @type {string[]}
+ */
+const SPANISH_REGIONS = Array.from(SPAIN_TAXES.keys()).sort();
+
+/**
+ * List of UK regions that are valid for taxes_and_fees_uk(...).
+ *
+ * @type {string[]}
+ */
+const UK_REGIONS = ['England and N.I.', 'Scotland', 'Wales'];
+
+/**
  * Portuguese IMT tax brackets
  * @type {TaxBracket[]}
  */
@@ -155,6 +162,63 @@ const PORTUGAL_IMT_BRACKETS = [
     new TaxBracket(139_412, 190_086, 0.05),
     new TaxBracket(190_086, 316_772, 0.07),
     new TaxBracket(316_772, 633_453, 0.08),
+];
+
+/**
+ * England and Northern Ireland Stamp Duty and Land Tax brackets
+ * @type {TaxBracket[]}
+ */
+const ENGLAND_SDLT_BRACKETS = [
+    new TaxBracket(0, 125_000, 0),
+    new TaxBracket(125_000, 250_001, 0.02),
+    new TaxBracket(250_000, 925_001, 0.05),
+    new TaxBracket(925_001, 1_500_001, 0.1),
+    new TaxBracket(1_500_000, Number.MAX_SAFE_INTEGER, 0.12),
+];
+
+/**
+ * England and Northern Ireland Stamp Duty and Land Tax brackets for first time buyers
+ * @type {TaxBracket[]}
+ */
+const ENGLAND_SDLT_FIRST_TIME_BUYERS_BRACKETS = [
+    new TaxBracket(0, 425_000, 0),
+    new TaxBracket(425_000, 625_000, 0.05),
+];
+
+/**
+ * Scottish Land and Buildings Transaction Tax brackets
+ * @type {TaxBracket[]}
+ */
+const SCOTLAND_LBTT_BRACKETS = [
+    new TaxBracket(0, 145_000, 0),
+    new TaxBracket(145_000, 250_000, 0.02),
+    new TaxBracket(250_000, 325_000, 0.05),
+    new TaxBracket(325_000, 750_000, 0.1),
+    new TaxBracket(750_000, Number.MAX_SAFE_INTEGER, 0.12),
+];
+
+/**
+ * Scottish Land and Buildings Transaction Tax brackets for first time buyers
+ * @type {TaxBracket[]}
+ */
+const SCOTLAND_LBTT_FIRST_TIME_BUYERS_BRACKETS = [
+    new TaxBracket(0, 175_000, 0),
+    new TaxBracket(145_000, 250_000, 0.02),
+    new TaxBracket(250_000, 325_000, 0.05),
+    new TaxBracket(325_000, 750_000, 0.1),
+    new TaxBracket(750_000, Number.MAX_SAFE_INTEGER, 0.12),
+];
+
+/**
+ * Wales Land Transaction Tax brackets
+ * @type {TaxBracket[]}
+ */
+const WALES_LTT_BRACKETS = [
+    new TaxBracket(0, 225_000, 0),
+    new TaxBracket(225_000, 400_000, 0.06),
+    new TaxBracket(400_000, 750_000, 0.075),
+    new TaxBracket(750_000, 1_500_000, 0.1),
+    new TaxBracket(1_500_000, Number.MAX_SAFE_INTEGER, 0.12),
 ];
 
 /**
@@ -208,4 +272,36 @@ function taxes_and_fees_portugal(house_price, mortgage_principal) {
     // IMI - This is a yearly tax so won't consider it part of the purchase.
 
     return stamp_duty_deed + stamp_duty_mortgage + imt;
+}
+
+function taxes_and_fees_uk(region, house_price, first_home, mortgage) {
+    let total = 0;
+
+    if (mortgage) {
+        /*
+        This is hard to estimate, so I've used the following values:
+        booking fee: 200
+        product fee: 1000
+        account fee: 200
+        surveyor: 900
+        conveyancing fee: 2000
+         */
+        total += 4300;
+    }
+
+    switch (region) {
+        case UK_REGIONS[1]:
+            if (first_home) {
+                return total + calculate_progressive_tax(house_price, SCOTLAND_LBTT_FIRST_TIME_BUYERS_BRACKETS);
+            }
+            return total + calculate_progressive_tax(house_price, SCOTLAND_LBTT_BRACKETS);
+        case UK_REGIONS[2]:
+            return total + calculate_progressive_tax(house_price, WALES_LTT_BRACKETS);
+        default:
+        case UK_REGIONS[0]:
+            if (first_home && house_price < 625_000) {
+                return total + calculate_progressive_tax(house_price, ENGLAND_SDLT_FIRST_TIME_BUYERS_BRACKETS);
+            }
+            else return total + calculate_progressive_tax(house_price, ENGLAND_SDLT_BRACKETS);
+    }
 }

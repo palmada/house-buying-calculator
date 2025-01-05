@@ -43,6 +43,7 @@ If not, see <https://www.gnu.org/licenses/>.
         appendParameter('currency');
         appendParameter('house_price');
         parameters.append('new_build', document.getElementById('new_build').checked); // Checkboxes are set differently
+        parameters.append('first_home', document.getElementById('first_home').checked); // Checkboxes are set differently
         appendParameter('savings');
         appendParameter('monthly_savings');
         appendParameter('mortgage_rate');
@@ -65,6 +66,11 @@ If not, see <https://www.gnu.org/licenses/>.
 <body>
 
 <h1>House buying calculator</h1>
+<div>
+    This calculator is for people looking for a home where they will reside permanently, therefore the
+    calculations don't apply for people looking to buy as investment (i.e. renting out), or to buy as holiday
+    homes, for example.
+</div>
 
 <form>
     <table>
@@ -80,6 +86,10 @@ If not, see <https://www.gnu.org/licenses/>.
             <label for="new_build">
                 <span class="label-span">New build?</span>
                 <input type="checkbox" id="new_build" name="new_build" oninput="calculate()">
+            </label>
+            <label for="first_home">
+                <span class="label-span">First home?</span>
+                <input type="checkbox" id="first_home" name="first_home" oninput="calculate()">
             </label>
             <label for="taxes">
                 <span class="label-span">Tax region:</span>
@@ -226,6 +236,10 @@ If not, see <https://www.gnu.org/licenses/>.
         add_selector_option(tax_selector, 'spain-' + region, 'Spain - ' + region);
     }
 
+    for (let region of UK_REGIONS) {
+        add_selector_option(tax_selector, 'uk-' + region, 'UK - ' + region);
+    }
+
     add_selector_option(tax_selector, 'custom', "Custom tax amount");
 
     /**
@@ -285,6 +299,7 @@ If not, see <https://www.gnu.org/licenses/>.
     setParameter('currency', '€')
     setParameter('house_price', 100_000);
     setCheckbox('new_build');
+    setCheckbox('first_home');
     setParameter('savings', 1000);
     setParameter('monthly_savings', 100);
     setParameter('mortgage_rate', 3.5, 0, 100);

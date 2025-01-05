@@ -27,10 +27,11 @@ const DATE_MED = luxon.DateTime.DATE_MED;
  * @param {number} house_price The price of the house
  * @param {number} mortgage_principal How much we will borrow from the bank; 0 or less if not being used.
  *                                    A rough estimate is fine as this will be a relatively low impact on the total tax.
- * @param {boolean} new_build Whether this is a new house
+ * @param {boolean} new_build Whether this is a new house. Affects Spanish tax.
+ * @param {boolean} first_home Whether this is the first home being bought. Affects UK tax.
  * @returns {number}
  */
-function get_tax_amount(tax_region, house_price, mortgage_principal, new_build) {
+function get_tax_amount(tax_region, house_price, mortgage_principal, new_build = false, first_home = true) {
     let tax_amount = 0;
     let mortgage = mortgage_principal > 0;
     if (tax_region.startsWith('portugal')) {
@@ -40,6 +41,10 @@ function get_tax_amount(tax_region, house_price, mortgage_principal, new_build) 
     else if (tax_region.startsWith('spain')) {
         tax_region = tax_region.replace("spain-", "");
         tax_amount = taxes_and_fees_spain(tax_region, house_price, new_build, mortgage);
+    }
+    else if (tax_region.startsWith('uk')) {
+        tax_region = tax_region.replace("uk-", "");
+        tax_amount = taxes_and_fees_uk(tax_region, house_price, first_home, mortgage);
     }
 
     return tax_amount;
@@ -57,6 +62,7 @@ function calculate() {
 
     let house_price = parseFloat(document.getElementById("house_price").value);
     let new_build = document.getElementById("new_build").checked;
+    let first_home = document.getElementById("first_home").checked;
     let tax_region = document.getElementById("taxes").value;
     let current_savings = parseFloat(document.getElementById("savings").value);
     let custom_tax = false;
@@ -74,10 +80,10 @@ function calculate() {
         // calculation.
         // We therefore fudge an initial calculation to have a more accurate starting point.
         // First we get a rough idea of a deposit assuming a 0% down-payment mortgage
-        let deposit = current_savings - get_tax_amount(tax_region, house_price, house_price, new_build);
+        let deposit = current_savings - get_tax_amount(tax_region, house_price, house_price, new_build, first_home);
         // We now have a rough tax estimate we can use to calculate a non-0% down-payment.
         let mortgage_principal = house_price - deposit;
-        tax_amount = get_tax_amount(tax_region, house_price, mortgage_principal, new_build);
+        tax_amount = get_tax_amount(tax_region, house_price, mortgage_principal, new_build, first_home);
     }
 
     let mortgage_interest_rate = parseFloat(document.getElementById("mortgage_rate").value);
@@ -169,7 +175,7 @@ function calculate() {
             // The tax amount will grow with the growth of the house price
             // Note we use the principal amount for the previous month, this is because get_tax_amount has a circular
             // dependency...
-            tax_amount = get_tax_amount(tax_region, house_price, simulation.principal_amount, new_build);
+            tax_amount = get_tax_amount(tax_region, house_price, simulation.principal_amount, new_build, first_home);
         }
 
         month_index++
@@ -253,7 +259,7 @@ function calculate() {
         let rent_paid = Math.round(buy_outright_date.diff(DateTime.now(), 'months').months) * rent;
 
         if ( ! custom_tax) {
-            tax_amount = Math.round(get_tax_amount(tax_region, buy_outright_price, 0, new_build));
+            tax_amount = Math.round(get_tax_amount(tax_region, buy_outright_price, 0, new_build, first_home));
         }
 
         scenario_3.innerHTML = "<b>Buying outright</b><br>" +

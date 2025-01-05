@@ -11,7 +11,6 @@ If not, see <https://www.gnu.org/licenses/>.
 
 // Spanish taxes last updated January 2025
 const SPAIN_TAXES = new Map();
-const CANARIAS = 'Canarias';
 
 /**
  * Describes the taxes application to a given Spanish Autonomous region.
@@ -38,14 +37,11 @@ class SpanishRegionalTax {
      */
     vat = 0.1;
 
-    constructor(region, ajd, itp) {
-        if (region === CANARIAS) {
-            this.vat = 0.065;
-        }
-
+    constructor(region, ajd, itp, vat = 0.1) {
         this.region = region;
         this.ajd = ajd;
         this.itp = itp;
+        this.vat = vat;
     }
 
     getTax(house_price, new_build) {
@@ -66,7 +62,7 @@ SpanishRegionalTax.RegisterRegion('Andalucía', 0.012, 0.07);
 SpanishRegionalTax.RegisterRegion('Aragón', 0.015, 0.08);
 SpanishRegionalTax.RegisterRegion('Asturias', 0.012, 0.08);
 SpanishRegionalTax.RegisterRegion('Baleares', 0.012, 0.08);
-SpanishRegionalTax.RegisterRegion(CANARIAS, 0.012, 0.065);
+SpanishRegionalTax.RegisterRegion('Canarias', 0.012, 0.065, 0.065);
 SpanishRegionalTax.RegisterRegion('Cantabria', 0.015, 0.09);
 SpanishRegionalTax.RegisterRegion('Castilla-La Mancha', 0.015, 0.09);
 SpanishRegionalTax.RegisterRegion('Castilla y Leon', 0.015, 0.08);

@@ -14,10 +14,6 @@ html, body {
     margin: 5px;
 }
 
-input, span {
-    margin: 4px;
-}
-
 table {
     width: 90%;
     margin-left: auto;
@@ -29,7 +25,28 @@ td {
 }
 
 .inputs {
-    width: 30%;
+    width: 45%;
+    margin: auto;
+}
+
+input {
+    width: 85px;
+    margin: 5px;
+}
+
+.birth_date {
+    width: 120px;
+}
+
+.tax_selector {
+    width: 200px;
+}
+
+label .label-span
+{
+    display: inline-block;
+    text-align: right;
+    width: 300px;
 }
 
 .chart {

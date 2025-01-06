@@ -205,27 +205,15 @@ function calculate() {
     if (can_get_mortgage) {
         if (min_deposit_simulation.date <= total_costs.keys().next().value) {
             scenario_1.innerHTML +=
-                "You have enough to get a mortgage already.<br>The calculations are for";
+                "You have enough to get a mortgage already.<br>This will be ";
         }
         else {
             scenario_1.innerHTML +=
-                "You will be able to afford the minimum deposit";
+                "You will be able to afford the minimum deposit ";
         }
 
-        scenario_1.innerHTML +=
-            " <b>" + min_deposit_simulation.date.toRelative() + "</b> (" +
-            min_deposit_simulation.date.toLocaleString(DATE_MED) + ")<br>" +
-            " with a deposit of " + min_deposit_simulation.deposit_percentage.toFixed(2) + "%" +
-            " (" + NUMBER_FORMAT.format(Math.round(min_deposit_simulation.deposit)) + currency + "),<br>" +
-            " a monthly payment of "
-            + NUMBER_FORMAT.format(Math.round(min_deposit_simulation.monthly_payment)) + currency + ",<br>" +
-            " over a " + NUMBER_FORMAT.format((min_deposit_simulation.duration/ 12).toFixed(1)) +
-            " year term, ending " + min_deposit_simulation.end_date.toLocaleString(DATE_MED) +
-            ".<br>" +
-            "Your total cost will be " +
-            NUMBER_FORMAT.format(total_costs.get(min_deposit_simulation.date)) + currency + ". <br>" +
-            "By then, the house will be valued at " +
-            NUMBER_FORMAT.format(Math.round(min_deposit_simulation.house_price)) + currency + ".";
+        scenario_1.innerHTML += "<b>" + min_deposit_simulation.date.toRelative() + "</b>. Details: <br>" +
+            min_deposit_simulation.generate_output(currency, total_costs.get(min_deposit_simulation.date));
     }
     else {
         scenario_1.innerHTML +=
@@ -243,20 +231,9 @@ function calculate() {
         }
         else {
             scenario_2.innerHTML +=
-                "You will save the most by waiting a bit before buying a house.<br> This will be" +
-                " <b>" + min_cost_simulation.date.toRelative()+ "</b>" +
-                " (" + min_cost_simulation.date.toLocaleString(DATE_MED) + ")<br>" +
-                " with a deposit of " + min_cost_simulation.deposit_percentage.toFixed(2) + "%" +
-                " (" + NUMBER_FORMAT.format(Math.round(min_cost_simulation.deposit)) + currency + "),<br>" +
-                " a monthly payment of "
-                + NUMBER_FORMAT.format(Math.round(min_cost_simulation.monthly_payment)) + currency + ",<br>" +
-                " over a " + NUMBER_FORMAT.format((min_cost_simulation.duration / 12).toFixed(1)) +
-                " year term, ending " + min_cost_simulation.end_date.toLocaleString(DATE_MED) +
-                ".<br>" +
-                "Your total cost will be " +
-                NUMBER_FORMAT.format(total_costs.get(min_cost_simulation.date)) + currency + ".<br>" +
-                "By then, the house will be valued at " +
-                NUMBER_FORMAT.format(Math.round(min_cost_simulation.house_price)) + currency + ".";
+                "You will save the most by waiting a bit before buying a house, which will be " +
+                " <b>" + min_cost_simulation.date.toRelative()+ "</b>. Details:<br>" +
+                min_cost_simulation.generate_output(currency, total_costs.get(this.date));
         }
     }
     else {
@@ -432,5 +409,24 @@ class MortgageSimulation {
                 this.monthly_payment
             );
         }
+    }
+
+    generate_output(currency, total_cost) {
+        let output = "<ul>";
+
+        let add_line = (title, value) => {
+            output += '<li>' + title + " - " + value + "</li>";
+        }
+
+        add_line('Date', this.date.toLocaleString(DATE_MED));
+        add_line('Deposit', this.deposit_percentage.toFixed(2)  + '% ('
+        + (this.deposit.toFixed(2)  + currency + ')'));
+        add_line('Monthly payment', NUMBER_FORMAT.format(Math.round(this.monthly_payment)) + currency);
+        add_line('Duration', NUMBER_FORMAT.format((this.duration/ 12).toFixed(1)) + ' years');
+        add_line('End date', this.end_date.toLocaleString(DATE_MED))
+        add_line('Total cost',NUMBER_FORMAT.format(total_cost) + currency);
+        add_line('House will be valued at', NUMBER_FORMAT.format(Math.round(this.house_price)) + currency);
+
+        return output + '</ul>';
     }
 }
